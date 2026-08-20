@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#08152e] text-slate-100 antialiased font-sans transition-colors duration-200;
+  }
+}
+
+/* OpenDyslexic / Accessible font styling */
+html.font-dyslexic,
+html.font-dyslexic * {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.08em !important;
+}
+
+/* 1. HIGH CONTRAST YELLOW ON BLACK (WCAG AAA) */
+html.high-contrast-yellow,
+html.high-contrast-yellow body,
+html.high-contrast-yellow main,
+html.high-contrast-yellow header,
+html.high-contrast-yellow nav,
+html.high-contrast-yellow aside,
+html.high-contrast-yellow footer,
+html.high-contrast-yellow section,
+html.high-contrast-yellow div,
+html.high-contrast-yellow article {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
+html.high-contrast-yellow h1,
+html.high-contrast-yellow h2,
+html.high-contrast-yellow h3,
+html.high-contrast-yellow h4,
+html.high-contrast-yellow h5,
+html.high-contrast-yellow h6,
+html.high-contrast-yellow p,
+html.high-contrast-yellow span,
+html.high-contrast-yellow label,
+html.high-contrast-yellow li {
+  color: #ffff00 !important;
+}
+
+html.high-contrast-yellow a,
+html.high-contrast-yellow button {
+  background-color: #000000 !important;
+  color: #00ffff !important;
+  border-color: #00ffff !important;
+}
+
+html.high-contrast-yellow input,
+html.high-contrast-yellow textarea,
+html.high-contrast-yellow select {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
+/* 2. HIGH CONTRAST CYAN ON NAVY */
+html.high-contrast-blue,
+html.high-contrast-blue body,
+html.high-contrast-blue main,
+html.high-contrast-blue header,
+html.high-contrast-blue nav,
+html.high-contrast-blue aside,
+html.high-contrast-blue footer,
+html.high-contrast-blue section,
+html.high-contrast-blue div,
+html.high-contrast-blue article {
+  background-color: #030d22 !important;
+  color: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+}
+
+html.high-contrast-blue h1,
+html.high-contrast-blue h2,
+html.high-contrast-blue h3,
+html.high-contrast-blue h4,
+html.high-contrast-blue h5,
+html.high-contrast-blue h6,
+html.high-contrast-blue p,
+html.high-contrast-blue span,
+html.high-contrast-blue label,
+html.high-contrast-blue li {
+  color: #e0f2fe !important;
+}
+
+html.high-contrast-blue a,
+html.high-contrast-blue button {
+  background-color: #0c234a !important;
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+}
+
+html.high-contrast-blue input,
+html.high-contrast-blue textarea,
+html.high-contrast-blue select {
+  background-color: #081a3b !important;
+  color: #ffffff !important;
+  border-color: #38bdf8 !important;
+}
+
+/* 3. DEEP DARK OLED */
+html.contrast-dark,
+html.contrast-dark body,
+html.contrast-dark main,
+html.contrast-dark header,
+html.contrast-dark nav,
+html.contrast-dark aside,
+html.contrast-dark footer,
+html.contrast-dark section,
+html.contrast-dark div,
+html.contrast-dark article {
+  background-color: #05070d !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+html.contrast-dark a,
+html.contrast-dark button {
+  border-color: #475569 !important;
+}
+
+/* Custom Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* WCAG Focus Indicators */
+:focus-visible {
+  outline: 3px solid #0284c7 !important;
+  outline-offset: 2px !important;
+}
