@@ -1,17 +1,100 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
+import { Student } from '@/types';
 import { Users, CheckCircle2, Plus, Search } from 'lucide-react';
+
+interface RegisteredUser {
+  id: string;
+  full_name: string;
+  phone_or_email: string;
+  preferred_lang: string;
+  disability_type: string | null;
+  state: string | null;
+  district: string | null;
+  created_at: string;
+}
+
+function toStudent(u: RegisteredUser): Student {
+  return {
+    id: u.id,
+    rollNumber: u.phone_or_email,
+    fullName: u.full_name,
+    age: 0,
+    grade: 'Registered via Portal',
+    section: '',
+    institutionId: '',
+    institutionName: u.district ? `${u.district} District` : 'Registered via Portal',
+    guardianName: '',
+    guardianPhone: u.phone_or_email,
+    guardianEmail: u.phone_or_email,
+    emergencyContact: u.phone_or_email,
+    disabilityPercentage: 0,
+    udidCardNumber: '',
+    academicPerformanceScore: 0,
+    supportHistoryCount: 0,
+    activeAccommodationsCount: 0,
+    ilpStatus: 'draft',
+    ispStatus: 'draft',
+    accessibilityProfile: {
+      id: u.id,
+      studentId: u.id,
+      categories: u.disability_type ? [u.disability_type as any] : ['visual'],
+      primaryCategory: (u.disability_type || 'visual') as any,
+      severity: 'moderate',
+      communicationPreference: 'standard',
+      learningFormatPreference: 'interactive',
+      examinationFormatPreference: 'extra_time',
+      assistiveTechNeeded: [],
+      classroomAccommodationsNeeded: [],
+      digitalAccommodationsNeeded: [],
+      transportationNeeded: false,
+      updatedAt: u.created_at,
+    },
+  };
+}
 
 export default function StudentsPage() {
   const { students } = useAppStore();
+  const [registeredStudents, setRegisteredStudents] = useState<Student[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>('std-001');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const currentStudent = students.find((s) => s.id === selectedStudentId) || students[0];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('id, full_name, phone_or_email, preferred_lang, disability_type, state, district, created_at')
+          .eq('role', 'student')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!cancelled && data) {
+          setRegisteredStudents((data as RegisteredUser[]).map(toStudent));
+        }
+      } catch (err) {
+        console.error('Failed to load registered students:', err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const filteredStudents = students.filter(
+  // Merge DB-registered students with the store (mock) students, de-duped by name
+  const combinedStudents = [
+    ...students,
+    ...registeredStudents.filter(
+      (r) => !students.some((s) => s.fullName.toLowerCase() === r.fullName.toLowerCase())
+    ),
+  ];
+
+  const currentStudent = combinedStudents.find((s) => s.id === selectedStudentId) || combinedStudents[0];
+
+  const filteredStudents = combinedStudents.filter(
     (s) =>
       s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.rollNumber.toLowerCase().includes(searchTerm.toLowerCase())

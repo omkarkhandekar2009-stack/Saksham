@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import {
   Shield,
   UserCheck,
@@ -47,7 +48,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !udidNumber) return;
 
@@ -92,6 +93,25 @@ export default function RegisterPage() {
     };
 
     addStudent(newStudent);
+
+    // Persist the registered student into the central Supabase `users` table (storage)
+    try {
+      const { error: dbError } = await supabase.from('users').upsert(
+        {
+          full_name: fullName,
+          phone_or_email: email || phone || udidNumber,
+          role: 'student',
+          preferred_lang: 'en',
+          disability_type: disabilityCategory,
+          state: 'Maharashtra',
+          district: '',
+        },
+        { onConflict: 'phone_or_email' }
+      );
+      if (dbError) console.error('Supabase upsert failed:', dbError.message);
+    } catch (err) {
+      console.error('Supabase upsert error:', err);
+    }
 
     setTimeout(() => {
       setIsSubmitting(false);
