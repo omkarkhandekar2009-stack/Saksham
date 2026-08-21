@@ -18,6 +18,7 @@ import {
   AlertOctagon,
   Sparkles,
   GraduationCap,
+  Briefcase,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -28,6 +29,7 @@ export const Sidebar: React.FC = () => {
   const navItems = [
     { label: t.navDashboard, href: '/dashboard', icon: LayoutDashboard },
     { label: t.navLifecycle, href: '/lifecycle', icon: GraduationCap },
+    { label: t.navOpportunities || 'Jobs & Internships', href: '/opportunities', icon: Briefcase },
     { label: t.navStudents, href: '/students', icon: Users },
     { label: t.navLearning, href: '/learning', icon: BookOpen },
     { label: t.navServices, href: '/accessibility', icon: HeartHandshake },
