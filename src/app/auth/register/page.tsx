@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const [dob, setDob] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [disabilityCategory, setDisabilityCategory] = useState('visual');
+  const [disabilityCategories, setDisabilityCategories] = useState<string[]>(['visual']);
   const [disabilityPercentage, setDisabilityPercentage] = useState(75);
   const [institutionName, setInstitutionName] = useState('Government Institute of Inclusive Science, Mumbai');
   const [grade, setGrade] = useState('Grade 11 - Science');
@@ -45,6 +45,14 @@ export default function RegisterPage() {
       setAccommodations(accommodations.filter((a) => a !== acc));
     } else {
       setAccommodations([...accommodations, acc]);
+    }
+  };
+
+  const toggleDisabilityCategory = (cat: string) => {
+    if (disabilityCategories.includes(cat)) {
+      setDisabilityCategories(disabilityCategories.filter((c) => c !== cat));
+    } else {
+      setDisabilityCategories([...disabilityCategories, cat]);
     }
   };
 
@@ -78,8 +86,8 @@ export default function RegisterPage() {
       accessibilityProfile: {
         id: `acc-${Date.now()}`,
         studentId: `std-${Date.now()}`,
-        categories: [disabilityCategory as any],
-        primaryCategory: disabilityCategory as any,
+        categories: disabilityCategories as any,
+        primaryCategory: disabilityCategories[0] as any,
         severity: (Number(disabilityPercentage) > 70 ? 'severe' : 'moderate') as 'moderate' | 'severe',
         communicationPreference: 'audio' as const,
         learningFormatPreference: 'audio_visual' as const,
@@ -102,7 +110,7 @@ export default function RegisterPage() {
           phone_or_email: email || phone || udidNumber,
           role: 'student',
           preferred_lang: 'en',
-          disability_type: disabilityCategory,
+          disability_type: disabilityCategories.join(','),
           state: 'Maharashtra',
           district: '',
         },
@@ -220,7 +228,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">Date of Birth</label>
                       <input
@@ -230,24 +238,6 @@ export default function RegisterPage() {
                         className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none"
                         required
                       />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">Disability Category</label>
-                      <select
-                        value={disabilityCategory}
-                        onChange={(e) => setDisabilityCategory(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none capitalize"
-                      >
-                        <option value="visual">Visual Impairment / Blindness</option>
-                        <option value="hearing">Hearing Impairment / Deaf</option>
-                        <option value="locomotor">Locomotor / Mobility Disability</option>
-                        <option value="intellectual">Intellectual Disability</option>
-                        <option value="autism">Autism / Neurodiverse</option>
-                        <option value="specific_learning">Specific Learning Disability (Dyslexia)</option>
-                        <option value="speech_language">Speech & Language Disability</option>
-                        <option value="multiple">Multiple Disabilities</option>
-                      </select>
                     </div>
 
                     <div>
@@ -265,6 +255,52 @@ export default function RegisterPage() {
                         <span className="text-slate-500 font-bold">%</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">Disability Category <span className="font-normal text-slate-400">(select all that apply)</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'visual', label: 'Visual Impairment / Blindness' },
+                        { value: 'hearing', label: 'Hearing Impairment / Deaf' },
+                        { value: 'locomotor', label: 'Locomotor / Mobility Disability' },
+                        { value: 'intellectual', label: 'Intellectual Disability' },
+                        { value: 'autism', label: 'Autism / Neurodiverse' },
+                        { value: 'specific_learning', label: 'Specific Learning Disability (Dyslexia)' },
+                        { value: 'speech_language', label: 'Speech & Language Disability' },
+                        { value: 'multiple', label: 'Multiple Disabilities' },
+                      ].map((cat) => {
+                        const selected = disabilityCategories.includes(cat.value);
+                        return (
+                          <button
+                            type="button"
+                            key={cat.value}
+                            onClick={() => toggleDisabilityCategory(cat.value)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${
+                              selected
+                                ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-700'
+                            }`}
+                          >
+                            <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 ${
+                              selected ? 'bg-white border-white' : 'border-slate-300'
+                            }`}>
+                              {selected && (
+                                <svg className="w-2.5 h-2.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </span>
+                            {cat.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {disabilityCategories.length > 0 && (
+                      <p className="text-[10px] text-blue-500 mt-1.5 font-medium">
+                        {disabilityCategories.length} {disabilityCategories.length === 1 ? 'category' : 'categories'} selected
+                      </p>
+                    )}
                   </div>
                 </div>
 

@@ -154,8 +154,14 @@ export default function KioskPage() {
             <span className="text-sm font-bold text-white">{activeStudent.fullName}</span>
           </div>
           <div className="bg-[#0f2b5c] p-4 rounded-2xl border border-blue-400/20">
-            <span className="text-blue-300 block mb-1">Disability Category</span>
-            <span className="text-sm font-bold text-emerald-400 capitalize">{activeStudent.accessibilityProfile.primaryCategory} (75%)</span>
+            <span className="text-blue-300 block mb-1">Disability Categories</span>
+            <div className="flex flex-wrap gap-1.5">
+              {activeStudent.accessibilityProfile.categories.map((cat, i) => (
+                <span key={i} className="inline-block px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold capitalize">
+                  {cat.replace(/_/g, ' ')}
+                </span>
+              ))}
+            </div>
           </div>
           <div className="bg-[#0f2b5c] p-4 rounded-2xl border border-blue-400/20">
             <span className="text-blue-300 block mb-1">Active Accommodations</span>

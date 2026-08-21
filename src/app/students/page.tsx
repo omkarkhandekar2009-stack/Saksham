@@ -18,6 +18,9 @@ interface RegisteredUser {
 }
 
 function toStudent(u: RegisteredUser): Student {
+  const categories = u.disability_type
+    ? u.disability_type.split(',').map((c) => c.trim()).filter(Boolean)
+    : ['visual'];
   return {
     id: u.id,
     rollNumber: u.phone_or_email,
@@ -41,8 +44,8 @@ function toStudent(u: RegisteredUser): Student {
     accessibilityProfile: {
       id: u.id,
       studentId: u.id,
-      categories: u.disability_type ? [u.disability_type as any] : ['visual'],
-      primaryCategory: (u.disability_type || 'visual') as any,
+      categories: categories as any,
+      primaryCategory: categories[0] as any,
       severity: 'moderate',
       communicationPreference: 'standard',
       learningFormatPreference: 'interactive',
@@ -158,7 +161,7 @@ export default function StudentsPage() {
                     {s.rollNumber}
                   </span>
                 </div>
-                <div className="text-xs text-blue-200 capitalize">{s.grade} • {s.accessibilityProfile.primaryCategory}</div>
+                <div className="text-xs text-blue-200 capitalize">{s.grade} • {s.accessibilityProfile.categories.join(', ')}</div>
               </button>
             ))}
           </div>
@@ -200,6 +203,23 @@ export default function StudentsPage() {
               <div className="bg-[#081a3b] p-4 rounded-2xl border border-blue-400/20">
                 <span className="text-blue-300 block mb-1">Emergency Contact</span>
                 <span className="text-xs font-bold text-blue-100">{currentStudent.emergencyContact}</span>
+              </div>
+            </div>
+
+            {/* Disability Categories */}
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider">
+                Disability Categories ({currentStudent.accessibilityProfile.categories.length})
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {currentStudent.accessibilityProfile.categories.map((cat, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold capitalize"
+                  >
+                    {cat.replace(/_/g, ' ')}
+                  </span>
+                ))}
               </div>
             </div>
 
