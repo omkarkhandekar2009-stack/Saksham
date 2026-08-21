@@ -43,10 +43,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-2xl tracking-wider text-slate-900">
-                  INCLUDE<span className="text-blue-600">360</span>
-                </span>
-                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
-                  SIH1500
+                  Saksham
                 </span>
               </div>
               <p className="text-[10px] text-slate-500 font-medium">
@@ -65,14 +62,6 @@ export default function HomePage() {
 
           {/* Action CTAs */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/kiosk"
-              className="hidden sm:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 transition"
-            >
-              <Monitor className="w-4 h-4 text-blue-600" />
-              Campus Kiosk
-            </Link>
-
             <Link
               href="/auth/login"
               className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-1.5 transform hover:-translate-y-0.5"
@@ -94,7 +83,7 @@ export default function HomePage() {
           <div className="relative z-10 max-w-4xl space-y-6">
             <div className="inline-flex items-center gap-2 bg-blue-100/70 border border-blue-200 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold shadow-xs">
               <Sparkles className="w-4 h-4 text-emerald-600" />
-              <span>Smart India Hackathon • National Problem Statement SIH1500</span>
+              <span>Saksham National Problem Statement</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 leading-tight">
@@ -105,7 +94,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-base sm:text-xl text-slate-600 font-medium leading-relaxed max-w-3xl">
-              <strong>INCLUDE360</strong> is an AI-powered national operating system connecting specially abled students, parents, teachers, accessibility coordinators, institutions, and government authorities for seamless conduct, legal compliance, and holistic education-to-career governance.
+              <strong>Saksham</strong> is an AI-powered national operating system connecting specially abled students, parents, teachers, accessibility coordinators, institutions, and government authorities for seamless conduct, legal compliance, and holistic education-to-career governance.
             </p>
 
             {/* Action CTAs */}
@@ -126,13 +115,6 @@ export default function HomePage() {
                 <span>Live System Dashboard</span>
               </Link>
 
-              <Link
-                href="/kiosk"
-                className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-5 py-4 rounded-2xl border border-slate-300 flex items-center gap-2 text-sm transition shadow-xs"
-              >
-                <Monitor className="w-4 h-4 text-blue-600" />
-                <span>Digital Campus Kiosk</span>
-              </Link>
             </div>
           </div>
         </section>
@@ -201,14 +183,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 5. THE 4-STAGE STUDENT LIFECYCLE (HOW INCLUDE360 WORKS) */}
+        {/* 5. THE 4-STAGE STUDENT LIFECYCLE (HOW SAKSHAM WORKS) */}
         <section id="lifecycle" className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <span className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full">
               Complete Education-to-Employment Pipeline
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-              How INCLUDE360 Empowers Students
+              How Saksham Empowers Students
             </h2>
             <p className="text-xs text-slate-500">
               From admission intake to classroom learning, examination accommodations, and affirmative-action career placement.
@@ -265,7 +247,7 @@ export default function HomePage() {
               Enterprise Technology Architecture
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
-              The 4 Pillars of INCLUDE360
+              The 4 Pillars of Saksham
             </h2>
             <p className="text-xs text-slate-500 mt-1">
               Combining hybrid digital-physical gateways with artificial intelligence and strict legal governance.
@@ -394,7 +376,7 @@ export default function HomePage() {
                 INCLUDE<span className="text-blue-600">360</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                AI-Powered Inclusive Education, Student Accessibility & Legal Governance Ecosystem. Built for Smart India Hackathon SIH1500.
+                AI-Powered Inclusive Education, Student Accessibility & Legal Governance Ecosystem.
               </p>
             </div>
 
@@ -414,7 +396,6 @@ export default function HomePage() {
                 <li><Link href="/auth/login" className="hover:text-blue-600">Unified Sign In Portal</Link></li>
                 <li><Link href="/dashboard" className="hover:text-blue-600">Role-Based Dashboard</Link></li>
                 <li><Link href="/lifecycle" className="hover:text-blue-600">Student Intake & Placements</Link></li>
-                <li><Link href="/kiosk" className="hover:text-blue-600">Campus Digital Kiosk</Link></li>
               </ul>
             </div>
 
@@ -427,7 +408,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px]">
-            <div>&copy; 2026 INCLUDE360. All rights reserved. Smart India Hackathon.</div>
+            <div>&copy; 2026 Saksham. All rights reserved.</div>
             <div className="text-emerald-700 font-bold">100% Inclusive • Accessible • Compliant</div>
           </div>
         </footer>

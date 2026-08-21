@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const SYSTEM_INSTRUCTION = `You are INCLUDE360 AI, the official intelligent assistant for INCLUDE360 — an AI-powered Inclusive Education, Accessibility & Governance Ecosystem built for Smart India Hackathon (SIH1500).
+const SYSTEM_INSTRUCTION = `You are Saksham AI, the official intelligent assistant for Saksham — an AI-powered Inclusive Education, Accessibility & Governance Ecosystem.
 
 YOUR CORE RESPONSIBILITIES & BOUNDARIES:
-1. ONLY answer questions related to INCLUDE360, inclusive education for specially-abled students, accessibility technologies, statutory legal compliance (RPWD Act 2016, UGC, NEP 2020), examination accommodations, institutional audits, and website features.
-2. If a user asks a question completely unrelated to inclusive education or this platform (e.g., unrelated movies, general programming, sports, cooking), politely decline and state: "I am specialized in the INCLUDE360 Inclusive Education Ecosystem. Please ask me about student accommodations, RPWD compliance, examination scribes, institutional audits, or platform features."
+1. ONLY answer questions related to Saksham, inclusive education for specially-abled students, accessibility technologies, statutory legal compliance (RPWD Act 2016, UGC, NEP 2020), examination accommodations, institutional audits, and website features.
+2. If a user asks a question completely unrelated to inclusive education or this platform (e.g., unrelated movies, general programming, sports, cooking), politely decline and state: "I am specialized in the Saksham Inclusive Education Ecosystem. Please ask me about student accommodations, RPWD compliance, examination scribes, institutional audits, or platform features."
 3. Always respond in clear, professional, structured Markdown with bullet points, bold highlights, and actionable steps.
 
-KEY INCLUDE360 DOMAIN KNOWLEDGE:
+KEY SAKSHAM DOMAIN KNOWLEDGE:
 - **RPWD Act 2016 Mandates**:
   - Section 16 & 17: Mandatory inclusive education, barrier-free access, special educator appointments, accessible study materials.
   - Section 32: 5% mandatory reservation in higher education admissions for disabled students.
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         reply,
         provider: `Groq (${usedModel})`,
-        sources: ['INCLUDE360 Live Knowledge Base', 'RPWD Act 2016', 'Platform DB'],
+        sources: ['Saksham Live Knowledge Base', 'RPWD Act 2016', 'Platform DB'],
         confidence: 98,
       });
     }
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
         },
         {
           role: 'model',
-          parts: [{ text: 'Understood. I am INCLUDE360 AI, strictly grounded in the inclusive education ecosystem and platform data.' }],
+          parts: [{ text: 'Understood. I am Saksham AI, strictly grounded in the inclusive education ecosystem and platform data.' }],
         },
       ];
 
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         reply: responseText,
         provider: 'Google Gemini',
-        sources: ['INCLUDE360 Knowledge Base', 'RPWD Act 2016', 'Live Platform Database'],
+        sources: ['Saksham Knowledge Base', 'RPWD Act 2016', 'Live Platform Database'],
         confidence: 96,
       });
     }

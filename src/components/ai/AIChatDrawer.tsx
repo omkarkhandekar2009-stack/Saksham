@@ -28,7 +28,7 @@ export const AIChatDrawer: React.FC = () => {
     {
       id: 'm-1',
       sender: 'ai',
-      text: 'Hello! I am **INCLUDE360 AI Assistant** (Powered by Groq / Llama 3.3).\n\nAsk me **ANY question** about our inclusive education platform, RPWD Act 2016 statutory guidelines, student IEPs, exam scribes, audits, or campus barrier reports.',
+      text: 'Hello! I am **Saksham AI Assistant** (Powered by Groq / Llama 3.3).\n\nAsk me **ANY question** about our inclusive education platform, RPWD Act 2016 statutory guidelines, student IEPs, exam scribes, audits, or campus barrier reports.',
       timestamp: 'Just now',
     },
   ]);
@@ -109,7 +109,7 @@ export const AIChatDrawer: React.FC = () => {
           text: data.reply,
           provider: data.provider || 'Groq Llama 3.3',
           confidence: data.confidence || 98,
-          sources: data.sources || ['INCLUDE360 Live Knowledge Engine'],
+          sources: data.sources || ['Saksham Live Knowledge Engine'],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         setMessages((prev) => [...prev, aiMsg]);
@@ -141,10 +141,10 @@ export const AIChatDrawer: React.FC = () => {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 left-6 z-40 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-slate-950 font-black px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 text-sm transition transform hover:scale-105 border border-cyan-300"
-        aria-label="Open INCLUDE360 AI Assistant"
+        aria-label="Open Saksham AI Assistant"
       >
         <Sparkles className="w-5 h-5 text-slate-950 animate-pulse" />
-        <span>INCLUDE360 AI Assistant</span>
+        <span>Saksham AI Assistant</span>
       </button>
 
       {/* Chat Drawer Modal */}
@@ -159,7 +159,7 @@ export const AIChatDrawer: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-sm text-cyan-300 flex items-center gap-1.5">
-                    <span>INCLUDE360 AI Intelligence</span>
+                    <span>Saksham AI Intelligence</span>
                     <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-mono px-1.5 py-0.2 rounded border border-emerald-400/40">
                       Groq AI
                     </span>

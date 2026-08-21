@@ -3,18 +3,16 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { i18n } from '@/lib/i18n';
-import { Shield, Bell, Search, Building2 } from 'lucide-react';
+import { Shield, Bell } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { currentRole, language, notifications } = useAppStore();
-  const t = i18n[language];
+  const { notifications } = useAppStore();
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <header className="bg-[#0f2b5c] border-b border-cyan-500/30 text-white sticky top-0 z-30 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo & Platform Name */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-teal-400 to-blue-500 p-0.5 shadow-md group-hover:scale-105 transition">
@@ -22,42 +20,23 @@ export const Navbar: React.FC = () => {
               <Shield className="w-5 h-5 text-cyan-400" />
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-black text-xl tracking-wider text-white">
-                INCLUDE<span className="text-cyan-400">360</span>
+          <div className="leading-none">
+            <div className="flex items-baseline gap-2">
+              <span className="font-black text-2xl tracking-tight text-white">
+                Sak<span className="text-cyan-300">sham</span>
               </span>
-              <span className="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-400/40">
-                SIH1500
+              <span className="hidden md:inline text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">
+                सक्षम
               </span>
             </div>
-            <p className="text-[10px] text-blue-200 font-medium hidden sm:block">
-              {t.subTagline}
+            <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-200 hidden sm:block">
+              Inclusive Education &amp; Student Empowerment
             </p>
           </div>
         </Link>
 
-        {/* Global Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-md items-center bg-[#081a3b] border border-blue-400/30 focus-within:border-cyan-400 rounded-xl px-3 py-1.5 transition">
-          <Search className="w-4 h-4 text-cyan-300 mr-2" />
-          <input
-            type="text"
-            placeholder="Search students, scribes, audits, compliance laws..."
-            className="bg-transparent w-full text-xs text-white placeholder-blue-300 focus:outline-none"
-          />
-        </div>
-
         {/* Right Action Icons & User Info */}
         <div className="flex items-center gap-3">
-          {/* Kiosk Mode Quick Link */}
-          <Link
-            href="/kiosk"
-            className="hidden lg:flex items-center gap-1.5 bg-[#123366] hover:bg-[#184282] text-cyan-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-cyan-400/30 transition"
-          >
-            <Building2 className="w-3.5 h-3.5 text-cyan-400" />
-            Kiosk Mode
-          </Link>
-
           {/* Notifications Dropdown */}
           <div className="relative">
             <button
@@ -95,15 +74,6 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Current Role Badge */}
-          <div className="flex items-center gap-2 bg-[#081a3b] border border-cyan-400/30 rounded-xl px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <div className="text-left">
-              <div className="text-[9px] text-cyan-300 uppercase font-bold tracking-wider">Active Role</div>
-              <div className="text-xs font-black text-white capitalize">{currentRole.replace('_', ' ')}</div>
-            </div>
           </div>
         </div>
       </div>

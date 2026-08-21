@@ -361,7 +361,7 @@ export default function LoginPage() {
 
       {/* Bottom Legal Footer */}
       <footer className="max-w-4xl mx-auto w-full pt-6 border-t border-slate-200 text-center text-xs text-slate-500 space-y-1">
-        <p>&copy; 2026 INCLUDE360. All rights reserved. Ministry of Education & RPWD Act 2016 Compliant.</p>
+        <p>&copy; 2026 Saksham. All rights reserved. Ministry of Education & RPWD Act 2016 Compliant.</p>
         <p className="text-[11px] text-slate-400">
           Designed for inclusive accessibility with Web Speech Voice API and screen reader compatibility.
         </p>

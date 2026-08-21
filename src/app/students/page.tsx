@@ -66,6 +66,8 @@ export default function StudentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    if (!supabase) return;
+
     let cancelled = false;
     (async () => {
       try {

@@ -14,9 +14,7 @@ import {
   Building2,
   Scale,
   ShieldCheck,
-  BrainCircuit,
   Landmark,
-  Monitor,
   AlertOctagon,
   Sparkles,
   GraduationCap,
@@ -38,9 +36,7 @@ export const Sidebar: React.FC = () => {
     { label: t.navCompliance, href: '/compliance', icon: Scale },
     { label: t.navGovernance, href: '/governance', icon: ShieldCheck },
     { label: t.navConduct, href: '/conduct', icon: AlertOctagon },
-    { label: t.navAI, href: '/ai', icon: BrainCircuit },
     { label: t.navAuthorities, href: '/authorities', icon: Landmark },
-    { label: t.navKiosk, href: '/kiosk', icon: Monitor },
   ];
 
   return (
