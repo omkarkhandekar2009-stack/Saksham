@@ -202,7 +202,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <span className="font-black text-xl tracking-wider text-slate-900">
-              INCLUDE<span className="text-blue-600">360</span>
+              Sak<span className="text-blue-600">sham</span>
             </span>
             <p className="text-[10px] text-slate-500 font-medium">
               National Inclusive Education & Accessibility Gateway

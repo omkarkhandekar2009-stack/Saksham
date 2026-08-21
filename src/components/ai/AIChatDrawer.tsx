@@ -36,7 +36,7 @@ export const AIChatDrawer: React.FC = () => {
   // Load saved API key on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedKey = localStorage.getItem('inc360_ai_key') || '';
+      const savedKey = localStorage.getItem('saksham_ai_key') || '';
       if (savedKey) {
         setApiKey(savedKey);
         setTempKey(savedKey);
@@ -48,7 +48,7 @@ export const AIChatDrawer: React.FC = () => {
     const trimmed = keyToSave.trim();
     setApiKey(trimmed);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('inc360_ai_key', trimmed);
+      localStorage.setItem('saksham_ai_key', trimmed);
     }
     setShowKeyInput(false);
   };

@@ -373,7 +373,7 @@ export default function HomePage() {
             <div className="space-y-2">
               <div className="font-black text-slate-900 text-base flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-blue-600" />
-                INCLUDE<span className="text-blue-600">360</span>
+                Sak<span className="text-blue-600">sham</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-relaxed">
                 AI-Powered Inclusive Education, Student Accessibility & Legal Governance Ecosystem.

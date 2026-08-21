@@ -91,14 +91,14 @@ class Store {
 
   public setRole(role: Role) {
     this.state.currentRole = role;
-    if (typeof window !== 'undefined') localStorage.setItem('inc360_role', role);
+    if (typeof window !== 'undefined') localStorage.setItem('saksham_role', role);
     this.notify();
   }
 
   public setLanguage(lang: Language) {
     this.state.language = lang;
     this.state.accessibilitySettings.activeLanguage = lang;
-    if (typeof window !== 'undefined') localStorage.setItem('inc360_lang', lang);
+    if (typeof window !== 'undefined') localStorage.setItem('saksham_lang', lang);
     this.notify();
   }
 
@@ -106,7 +106,7 @@ class Store {
     this.state.accessibilitySettings = { ...this.state.accessibilitySettings, ...partial };
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('inc360_access_settings', JSON.stringify(this.state.accessibilitySettings));
+        localStorage.setItem('saksham_access_settings', JSON.stringify(this.state.accessibilitySettings));
       } catch (e) {}
     }
     this.notify();
@@ -149,15 +149,15 @@ export function useAppStore() {
 
     // Sync from localStorage after client hydration is complete
     if (typeof window !== 'undefined') {
-      const savedRole = localStorage.getItem('inc360_role') as Role;
+      const savedRole = localStorage.getItem('saksham_role') as Role;
       if (savedRole && savedRole !== globalStore.getState().currentRole) {
         globalStore.setRole(savedRole);
       }
-      const savedLang = localStorage.getItem('inc360_lang') as Language;
+      const savedLang = localStorage.getItem('saksham_lang') as Language;
       if (savedLang && savedLang !== globalStore.getState().language) {
         globalStore.setLanguage(savedLang);
       }
-      const savedSettings = localStorage.getItem('inc360_access_settings');
+      const savedSettings = localStorage.getItem('saksham_access_settings');
       if (savedSettings) {
         try {
           const parsed = JSON.parse(savedSettings);
