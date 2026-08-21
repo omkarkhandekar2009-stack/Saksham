@@ -3,12 +3,43 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { Shield, Bell } from 'lucide-react';
+import { i18n } from '@/lib/i18n';
+import { Shield, Bell, LogOut, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
 
 export const Navbar: React.FC = () => {
-  const { notifications } = useAppStore();
+  const router = useRouter();
+  const { notifications, currentRole, logout, language } = useAppStore();
+  const t = i18n[language] || i18n.hi;
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const isStudent = currentRole === 'student' || currentRole === 'parent';
+  const isProfessional = currentRole === 'accessibility_professional' || currentRole === 'professional';
+  const isGovernment =
+    currentRole === 'government' ||
+    currentRole === 'government_authority' ||
+    currentRole === 'district_officer' ||
+    currentRole === 'super_admin';
+
+  const roleBadgeLabel = isProfessional
+    ? language === 'hi'
+      ? 'सुलभता विशेषज्ञ पोर्टल'
+      : language === 'mr'
+      ? 'सुलभता व्यावसायिक पोर्टल'
+      : 'Accessibility Professional Portal'
+    : isStudent
+    ? t.portalStudent
+    : isGovernment
+    ? t.portalGov
+    : t.portalStaff;
+
+
+  const handleLogout = () => {
+    logout();
+    router.push('/auth/login');
+  };
 
   return (
     <header className="bg-[#0f2b5c] border-b border-cyan-500/30 text-white sticky top-0 z-30 shadow-lg">
@@ -30,13 +61,31 @@ export const Navbar: React.FC = () => {
               </span>
             </div>
             <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-200 hidden sm:block">
-              Inclusive Education &amp; Student Empowerment
+              {t.subTagline}
             </p>
           </div>
         </Link>
 
-        {/* Right Action Icons & User Info */}
+        {/* Right Action Icons, Role Badge & User Info */}
         <div className="flex items-center gap-3">
+          {/* Subtle Static Role Badge Indicator (Non-clickable) */}
+          <div className="flex items-center gap-1.5 bg-[#081a3b] border border-cyan-500/30 rounded-xl px-3 py-1.5 text-xs shadow-xs">
+            <User className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-cyan-200 font-bold text-xs">{roleBadgeLabel}</span>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-400/30 transition"
+            title={t.logout}
+            aria-label={t.logout}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{t.logout}</span>
+          </button>
+
+
           {/* Notifications Dropdown */}
           <div className="relative">
             <button
@@ -55,9 +104,10 @@ export const Navbar: React.FC = () => {
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-80 bg-[#0f2b5c] border border-cyan-500/30 rounded-xl shadow-2xl p-3 z-50 text-xs text-white">
                 <div className="flex items-center justify-between pb-2 border-b border-blue-400/20 font-bold">
-                  <span className="text-white">Notifications</span>
-                  <span className="text-[10px] text-cyan-300">{unreadCount} Unread</span>
+                  <span className="text-white">{language === 'hi' ? 'अधिसूचनाएं' : language === 'mr' ? 'सूचना' : 'Notifications'}</span>
+                  <span className="text-[10px] text-cyan-300">{unreadCount > 0 ? `${unreadCount} ${language === 'hi' ? 'अपठित' : language === 'mr' ? 'न वाचलेले' : 'Unread'}` : (language === 'hi' ? 'कोई नया नहीं' : language === 'mr' ? 'नवीन नाही' : 'All Read')}</span>
                 </div>
+
                 <div className="space-y-2 mt-2 max-h-60 overflow-y-auto">
                   {notifications.map((n) => (
                     <div

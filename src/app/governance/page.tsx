@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useAppStore } from '@/lib/store';
+import { i18n, localizeNumber } from '@/lib/i18n';
 import { Landmark, HandHeart, ExternalLink, CheckCircle2, MapPin, Compass, ShieldCheck, GraduationCap } from 'lucide-react';
 
 const governmentSchemes = [
@@ -76,6 +78,9 @@ const ngoPrograms = [
 ];
 
 export default function GovernancePage() {
+  const { language } = useAppStore();
+  const t = i18n[language] || i18n.hi;
+
   return (
     <div className="space-y-10 py-2">
       <section className="relative overflow-hidden rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-[#173b76] via-[#0f2b5c] to-[#0a1f42] px-6 py-8 sm:px-8 shadow-2xl">
@@ -84,27 +89,27 @@ export default function GovernancePage() {
         <div className="relative flex flex-col xl:flex-row xl:items-end justify-between gap-6">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-[#081a3b]/70 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
-              <Compass className="h-3.5 w-3.5" /> Jharkhand Support Directory
+              <Compass className="h-3.5 w-3.5" /> {language === 'hi' ? 'झारखंड सहायता निर्देशिका' : language === 'mr' ? 'झारखंड सहाय्य निर्देशिका' : 'Jharkhand Support Directory'}
             </div>
             <h1 className="mt-4 text-3xl sm:text-4xl font-black tracking-tight text-white">
-              Find the right support. <span className="text-cyan-300">Build an inclusive future.</span>
+              {t.govHeroTitle}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
-              A researched gateway to disability-focused government schemes and trusted organizations supporting children, students and families across Jharkhand.
+              {t.govHeroSubtitle}
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <div className="min-w-20 rounded-2xl border border-white/10 bg-[#081a3b]/70 p-3 text-center backdrop-blur-sm">
-              <div className="text-2xl font-black text-cyan-300">{governmentSchemes.length}</div>
-              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">Schemes</div>
+              <div className="text-2xl font-black text-cyan-300">{localizeNumber(governmentSchemes.length, language)}</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">{language === 'hi' ? 'योजनाएं' : language === 'mr' ? 'योजना' : 'Schemes'}</div>
             </div>
             <div className="min-w-20 rounded-2xl border border-white/10 bg-[#081a3b]/70 p-3 text-center backdrop-blur-sm">
-              <div className="text-2xl font-black text-emerald-300">{ngoPrograms.length}</div>
-              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">NGOs</div>
+              <div className="text-2xl font-black text-emerald-300">{localizeNumber(ngoPrograms.length, language)}</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">{language === 'hi' ? 'संस्थाएं' : language === 'mr' ? 'संस्था' : 'NGOs'}</div>
             </div>
             <div className="min-w-20 rounded-2xl border border-white/10 bg-[#081a3b]/70 p-3 text-center backdrop-blur-sm">
-              <div className="text-2xl font-black text-white">4+</div>
-              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">Districts</div>
+              <div className="text-2xl font-black text-white">{localizeNumber(4, language)}+</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-blue-200">{language === 'hi' ? 'जिले' : language === 'mr' ? 'जिल्हे' : 'Districts'}</div>
             </div>
           </div>
         </div>
@@ -114,17 +119,21 @@ export default function GovernancePage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 text-cyan-300 text-xs font-black uppercase tracking-wider">
-              <Landmark className="w-4 h-4" /> Jharkhand Government Support
+              <Landmark className="w-4 h-4" /> {language === 'hi' ? 'झारखंड सरकार सहायता' : language === 'mr' ? 'झारखंड शासन सहाय्य' : 'Jharkhand Government Support'}
             </div>
             <h2 id="jharkhand-schemes-heading" className="text-2xl font-black text-white mt-1">
-              Disability Schemes &amp; Student Support Pathways
+              {language === 'hi' ? 'दिव्यांग योजनाएं व छात्रवृत्ति' : language === 'mr' ? 'दिव्यांग योजना आणि शिष्यवृत्ती' : 'Disability Schemes & Student Support Pathways'}
             </h2>
             <p className="text-sm text-blue-200 mt-1 max-w-3xl">
-              Verified starting points for financial assistance and education support. Benefit amounts and application windows can change, so use the official link to confirm current rules.
+              {language === 'hi'
+                ? 'वित्तीय सहायता और शिक्षा सहयोग हेतु सत्यापित सरकारी योजनाएं। लाभ राशि व पात्रता संबंधी आधिकारिक लिंक से पुष्टि करें।'
+                : language === 'mr'
+                ? 'आर्थिक सहाय्य आणि शिक्षण मदतीसाठी पडताळणी केलेल्या सरकारी योजना. लाभ रक्कम आणि पात्रतेसाठी अधिकृत लिंक तपासा.'
+                : 'Verified starting points for financial assistance and education support. Benefit amounts and application windows can change, so use the official link to confirm current rules.'}
             </p>
           </div>
           <span className="shrink-0 text-[10px] font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 rounded-full px-3 py-1.5">
-            Official sources reviewed · August 2026
+            {language === 'hi' ? 'आधिकारिक स्रोत समीक्षा · अगस्त २०२६' : language === 'mr' ? 'अधिकृत स्रोत आढावा · ऑगस्ट २०२६' : 'Official sources reviewed · August 2026'}
           </span>
         </div>
 
@@ -136,14 +145,16 @@ export default function GovernancePage() {
                 <div className="p-2.5 bg-cyan-500/10 border border-cyan-400/30 rounded-xl">
                   <Landmark className="w-5 h-5 text-cyan-300" />
                 </div>
-                <span className="text-[9px] uppercase tracking-wider font-black text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-full">Government</span>
+                <span className="text-[9px] uppercase tracking-wider font-black text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                  {language === 'hi' ? 'सरकारी' : language === 'mr' ? 'शासकीय' : 'Government'}
+                </span>
               </div>
               <h3 className="text-base font-black text-white mt-4 leading-snug">{scheme.name}</h3>
               <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-300 mt-1">{scheme.authority}</p>
               <p className="text-xs leading-relaxed text-blue-100 mt-3">{scheme.summary}</p>
               <div className="mt-4 space-y-3 text-xs">
                 <div className="bg-[#081a3b] border border-blue-400/20 rounded-xl p-3">
-                  <div className="font-bold text-white mb-1">Who it supports</div>
+                  <div className="font-bold text-white mb-1">{language === 'hi' ? 'पात्रता व सहायता' : language === 'mr' ? 'पात्रता आणि सहाय्य' : 'Who it supports'}</div>
                   <p className="text-blue-200 leading-relaxed">{scheme.eligibility}</p>
                 </div>
                 <div className="flex gap-2 text-blue-200 leading-relaxed">
@@ -152,7 +163,7 @@ export default function GovernancePage() {
                 </div>
               </div>
               <a href={scheme.href} target="_blank" rel="noreferrer" className="mt-auto pt-5 text-xs font-black text-cyan-300 group-hover:text-white inline-flex items-center gap-1.5">
-                Open official information <ExternalLink className="w-3.5 h-3.5" />
+                {language === 'hi' ? 'आधिकारिक पोर्टल खोलें' : language === 'mr' ? 'अधिकृत पोर्टल उघडा' : 'Open official information'} <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </article>
           ))}
@@ -163,15 +174,21 @@ export default function GovernancePage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 text-emerald-300 text-xs font-black uppercase tracking-wider">
-              <HandHeart className="w-4 h-4" /> Community Support Network
+              <HandHeart className="w-4 h-4" /> {language === 'hi' ? 'सामुदायिक सहायता नेटवर्क' : language === 'mr' ? 'समुदाय सहाय्य नेटवर्क' : 'Community Support Network'}
             </div>
             <h2 id="jharkhand-ngos-heading" className="text-2xl font-black text-white mt-1">
-              Jharkhand NGOs Supporting Children &amp; Students
+              {language === 'hi' ? 'झारखंड में कार्यरत दिव्यांग सहायता संस्थाएं (NGOs)' : language === 'mr' ? 'झारखंडमधील दिव्यांग सहाय्य संस्था (NGOs)' : 'Jharkhand NGOs Supporting Children & Students'}
             </h2>
-            <p className="text-sm text-blue-200 mt-1">Education, therapy, rehabilitation, family support and pathways toward independence.</p>
+            <p className="text-sm text-blue-200 mt-1">
+              {language === 'hi'
+                ? 'शिक्षा, थेरेपी, पुनर्वास, पारिवारिक परामर्श और आत्मनिर्भरता हेतु अग्रणी संस्थाएं।'
+                : language === 'mr'
+                ? 'शिक्षण, थेरपी, पुनर्वसन, कौटुंबिक मार्गदर्शन आणि स्वावलंबनासाठी प्रमुख संस्था.'
+                : 'Education, therapy, rehabilitation, family support and pathways toward independence.'}
+            </p>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-[10px] font-bold text-emerald-200">
-            <ShieldCheck className="h-4 w-4" /> Organization websites reviewed
+            <ShieldCheck className="h-4 w-4" /> {language === 'hi' ? 'संस्था पोर्टल सत्यापित' : language === 'mr' ? 'संस्था पोर्टल सत्यापित' : 'Organization websites reviewed'}
           </div>
         </div>
 
@@ -199,7 +216,7 @@ export default function GovernancePage() {
                   ))}
                 </ul>
                 <a href={ngo.href} target="_blank" rel="noreferrer" className="mt-auto pt-5 text-xs font-black text-emerald-300 group-hover:text-white inline-flex items-center gap-1.5">
-                  Visit organization website <ExternalLink className="w-3.5 h-3.5" />
+                  {language === 'hi' ? 'संस्था की वेबसाइट देखें' : language === 'mr' ? 'संस्थेची वेबसाइट पहा' : 'Visit organization website'} <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </article>

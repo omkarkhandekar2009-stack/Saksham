@@ -24,10 +24,15 @@ import {
 } from 'lucide-react';
 import { pwdJobsData, PwDJob, normalizeUrl } from '@/data/pwdJobsData';
 import { pwdInternshipsData, PwDInternship } from '@/data/pwdInternshipsData';
+import { useAppStore } from '@/lib/store';
+import { i18n, localizeNumber } from '@/lib/i18n';
 
 type OpportunityItem = PwDJob | PwDInternship;
 
 export default function OpportunitiesPage() {
+  const { language } = useAppStore();
+  const t = i18n[language] || i18n.hi;
+
   const searchInputId = useId();
   const locationSelectId = useId();
   const categorySelectId = useId();
@@ -36,6 +41,7 @@ export default function OpportunitiesPage() {
 
   // Active Tab: 'jobs' | 'internships'
   const [activeTab, setActiveTab] = useState<'jobs' | 'internships'>('jobs');
+
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -195,37 +201,41 @@ export default function OpportunitiesPage() {
           <div className="flex items-center gap-2">
             <span className="bg-[#081a3b] text-cyan-300 border border-cyan-400/40 text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              Inclusive Career Opportunities
+              {language === 'hi' ? 'समावेशी आजीविका अवसर' : language === 'mr' ? 'समावेशी करिअर संधी' : 'Inclusive Career Opportunities'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
-            Jobs & Internships for Every Ability
+            {t.oppHeroTitle}
           </h1>
           <p className="text-base sm:text-lg font-bold text-cyan-300 italic">
-            “Your skills define your future—not your barriers.”
+            {language === 'hi'
+              ? '“आपकी क्षमताएं आपका भविष्य तय करती हैं—बाधाएं नहीं।”'
+              : language === 'mr'
+              ? '“तुमची कौशल्ये तुमचे भविष्य ठरवतात—अडचणी नव्हेत.”'
+              : '“Your skills define your future—not your barriers.”'}
           </p>
           <p className="text-sm text-blue-100/90 leading-relaxed">
-            Explore accessible employment and internship opportunities across Jharkhand with PwD reservations and workplace accommodations.
+            {t.oppHeroSubtitle}
           </p>
         </div>
 
         {/* Dynamic Local Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
           <div className="p-3.5 bg-[#081a3b] border border-cyan-500/20 rounded-2xl">
-            <div className="text-[10px] font-bold text-blue-300 uppercase tracking-wider">CSV Jobs</div>
-            <div className="text-xl sm:text-2xl font-black text-white">{pwdJobsData.length}</div>
+            <div className="text-[10px] font-bold text-blue-300 uppercase tracking-wider">{t.oppTabJobs}</div>
+            <div className="text-xl sm:text-2xl font-black text-white">{localizeNumber(pwdJobsData.length, language)}</div>
           </div>
           <div className="p-3.5 bg-[#081a3b] border border-cyan-500/20 rounded-2xl">
-            <div className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">CSV Internships</div>
-            <div className="text-xl sm:text-2xl font-black text-emerald-300">{pwdInternshipsData.length}</div>
+            <div className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">{t.oppTabInternships}</div>
+            <div className="text-xl sm:text-2xl font-black text-emerald-300">{localizeNumber(pwdInternshipsData.length, language)}</div>
           </div>
           <div className="p-3.5 bg-[#081a3b] border border-cyan-500/20 rounded-2xl">
-            <div className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">Matching Search</div>
-            <div className="text-xl sm:text-2xl font-black text-cyan-300">{filteredDataset.length}</div>
+            <div className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{language === 'hi' ? 'सर्च परिणाम' : language === 'mr' ? 'शोध निकाल' : 'Matching Search'}</div>
+            <div className="text-xl sm:text-2xl font-black text-cyan-300">{localizeNumber(filteredDataset.length, language)}</div>
           </div>
           <div className="p-3.5 bg-[#081a3b] border border-cyan-500/20 rounded-2xl">
-            <div className="text-[10px] font-bold text-blue-200 uppercase tracking-wider">Bookmarked</div>
-            <div className="text-xl sm:text-2xl font-black text-blue-200">{savedIds.length}</div>
+            <div className="text-[10px] font-bold text-blue-200 uppercase tracking-wider">{language === 'hi' ? 'बुकमार्क' : language === 'mr' ? 'बुकमार्क' : 'Bookmarked'}</div>
+            <div className="text-xl sm:text-2xl font-black text-blue-200">{localizeNumber(savedIds.length, language)}</div>
           </div>
         </div>
       </div>
@@ -235,7 +245,7 @@ export default function OpportunitiesPage() {
         {/* Navigation Tabs (Jobs / Internships) */}
         <div className="space-y-2">
           <h2 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-            Select Opportunity Directory
+            {language === 'hi' ? 'अवसर निर्देशिका चुनें' : language === 'mr' ? 'संधी निर्देशिका निवडा' : 'Select Opportunity Directory'}
           </h2>
           <div
             role="tablist"
@@ -256,7 +266,7 @@ export default function OpportunitiesPage() {
               }`}
             >
               <Briefcase className="w-4 h-4" />
-              Jobs
+              {t.oppTabJobs}
             </button>
 
             <button
@@ -273,7 +283,7 @@ export default function OpportunitiesPage() {
               }`}
             >
               <Clock className="w-4 h-4" />
-              Internships
+              {t.oppTabInternships}
             </button>
           </div>
         </div>
@@ -283,14 +293,14 @@ export default function OpportunitiesPage() {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Filter className="w-4 h-4 text-cyan-400" />
-              Search & Filter {activeTab === 'jobs' ? 'Jobs' : 'Internships'}
+              {t.btnFilter} {activeTab === 'jobs' ? t.oppTabJobs : t.oppTabInternships}
             </h3>
             {(searchQuery || selectedLocation !== 'All Locations' || selectedCategory !== 'All Categories' || selectedWorkMode !== 'All Work Modes' || selectedRelevance !== 'All Relevance Types') && (
               <button
                 onClick={clearAllFilters}
                 className="text-xs text-cyan-300 hover:text-white underline font-semibold focus:outline-none focus:ring-1 focus:ring-cyan-300 p-1"
               >
-                Clear Filters
+                {language === 'hi' ? 'फ़िल्टर साफ़ करें' : language === 'mr' ? 'फिल्टर साफ करा' : 'Clear Filters'}
               </button>
             )}
           </div>
@@ -300,7 +310,7 @@ export default function OpportunitiesPage() {
             <div className="space-y-1 xl:col-span-2">
               <label htmlFor={searchInputId} className="text-xs font-bold text-cyan-200 flex items-center gap-1">
                 <Search className="w-3.5 h-3.5 text-cyan-400" />
-                Keyword Search
+                {t.btnSearch}
               </label>
               <div className="relative">
                 <input
@@ -308,7 +318,7 @@ export default function OpportunitiesPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={`Search ${activeTab === 'jobs' ? 'jobs' : 'internships'} by title, company, category...`}
+                  placeholder={language === 'hi' ? `पद, कंपनी या श्रेणी द्वारा खोजें...` : language === 'mr' ? `पद, कंपनी किंवा श्रेणीनुसार शोधा...` : `Search ${activeTab === 'jobs' ? 'jobs' : 'internships'} by title, company, category...`}
                   className="w-full bg-[#081a3b] text-white placeholder-blue-300/60 border border-cyan-500/30 rounded-xl py-2.5 pl-9 pr-8 text-xs outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 min-h-[44px]"
                 />
                 <Search className="w-4 h-4 text-blue-300 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -323,6 +333,7 @@ export default function OpportunitiesPage() {
                 )}
               </div>
             </div>
+
 
             {/* Location Select */}
             <div className="space-y-1">

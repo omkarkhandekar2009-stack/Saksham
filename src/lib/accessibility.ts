@@ -1,19 +1,24 @@
 export class AccessibilityEngine {
   private static synth: SpeechSynthesis | null = typeof window !== 'undefined' ? window.speechSynthesis : null;
 
-  public static speak(text: string, lang: 'en' | 'hi' | 'mr' = 'en', rate: number = 1.0) {
+  public static speak(text: string, lang: 'hi' | 'en' | 'mr' = 'hi', rate: number = 1.0) {
     if (!this.synth) return;
     this.synth.cancel(); // Stop any ongoing speech
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = rate;
     
-    if (lang === 'hi') utterance.lang = 'hi-IN';
-    else if (lang === 'mr') utterance.lang = 'mr-IN';
-    else utterance.lang = 'en-US';
+    if (lang === 'hi') {
+      utterance.lang = 'hi-IN';
+    } else if (lang === 'mr') {
+      utterance.lang = 'mr-IN';
+    } else {
+      utterance.lang = 'en-IN';
+    }
 
     this.synth.speak(utterance);
   }
+
 
   public static stopSpeaking() {
     if (this.synth) {

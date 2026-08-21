@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useId } from 'react';
+import Link from 'next/link';
+import { useAppStore } from '@/lib/store';
+import { i18n, localizeNumber } from '@/lib/i18n';
 import {
   Search,
+
   Filter,
   X,
   Info,
@@ -18,6 +22,8 @@ import {
   FileText,
   CheckCircle2,
   ExternalLink,
+  Lock,
+  ArrowRight,
 } from 'lucide-react';
 import { jharkhandSchoolsData, SpecialSchool } from '@/data/jharkhandSchoolsData';
 import { jharkhandCollegesData, SpecialEducationInstitute, normalizeWebsiteUrl } from '@/data/jharkhandCollegesData';
@@ -253,8 +259,15 @@ function InstitutionRatingsSection({
 }
 
 export default function AuditPage() {
+  const { currentRole, language } = useAppStore();
+  const t = i18n[language] || i18n.hi;
   const searchInputId = useId();
   const districtSelectId = useId();
+
+  const isStudent = currentRole === 'student' || currentRole === 'parent';
+  const isProfessional = currentRole === 'accessibility_professional' || currentRole === 'professional';
+  const isGovernment = currentRole === 'government' || currentRole === 'government_authority' || currentRole === 'district_officer' || currentRole === 'super_admin';
+  const isStaff = !isStudent && !isProfessional && !isGovernment;
 
   // Navigation Tab: 'schools' | 'colleges'
   const [selectedTab, setSelectedTab] = useState<'schools' | 'colleges'>('schools');
@@ -404,6 +417,190 @@ export default function AuditPage() {
     setCollegeSelectedDistrict('All Districts');
     setSrAnnouncement('Cleared college search and district filters.');
   };
+
+  if (isStaff) {
+    const auditSections = [
+      {
+        key: 'physical',
+        icon: '♿',
+        title: 'Physical Accessibility',
+        titleHi: 'भौतिक सुगमता',
+        titleMr: 'शारीरिक सुलभता',
+        items: ['Wheelchair-accessible entrance', 'Accessible toilets on all floors', 'Tactile pathways / Braille signage', 'Accessible parking', 'Lifts/ramps to all floors'],
+        scores: [1, 1, 0, 1, 0],
+      },
+      {
+        key: 'learning',
+        icon: '📚',
+        title: 'Learning Accessibility',
+        titleHi: 'शिक्षण सुगमता',
+        titleMr: 'शिक्षण सुलभता',
+        items: ['Accessible digital textbooks', 'Audio-recorded lectures available', 'Sign language classroom support', 'Enlarged-print materials', 'Alternative assessment formats'],
+        scores: [1, 0, 0, 1, 1],
+      },
+      {
+        key: 'tech',
+        icon: '💻',
+        title: 'Assistive Technology',
+        titleHi: 'सहायक तकनीक',
+        titleMr: 'सहाय्यक तंत्रज्ञान',
+        items: ['Screen reader-compatible computers (≥1)', 'Refreshable Braille display', 'FM loop system for hearing-impaired', 'Magnification software', 'Text-to-speech software installed'],
+        scores: [1, 0, 0, 0, 1],
+      },
+      {
+        key: 'human',
+        icon: '🤝',
+        title: 'Human Support',
+        titleHi: 'मानव सहायता',
+        titleMr: 'मानव सहाय्य',
+        items: ['Trained special educator', 'Sign language interpreter on staff', 'Accessibility coordinator designated', 'Scribe/reader roster maintained', 'Annual inclusive training for all staff'],
+        scores: [1, 0, 1, 1, 0],
+      },
+    ];
+
+    const sectionScore = (section: typeof auditSections[0]) => section.scores.reduce((a, b) => a + b, 0);
+    const totalScore = auditSections.reduce((acc, s) => acc + sectionScore(s), 0);
+    const totalPossible = auditSections.reduce((acc, s) => acc + s.items.length, 0);
+    const overallPercent = Math.round((totalScore / totalPossible) * 100);
+
+    return (
+      <div className="space-y-8 py-2">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0f2b5c] border border-cyan-500/30 p-6 rounded-3xl shadow-xl">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-[#081a3b] text-cyan-300 border border-cyan-400/40 text-xs font-bold px-3 py-0.5 rounded-full">
+                {language === 'hi' ? 'स्व-रिपोर्टिंग' : language === 'mr' ? 'स्व-अहवाल' : 'Self-Reporting'}
+              </span>
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                {t.staffAuditSelfReported}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{t.staffAuditTitle}</h1>
+            <p className="text-xs text-blue-100 mt-1">{t.staffAuditSubtitle}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => alert(language === 'hi' ? 'प्रारूप सुरक्षित किया गया!' : language === 'mr' ? 'मसुदा जतन केला!' : 'Draft saved!')} className="bg-[#081a3b] hover:bg-[#123366] text-cyan-300 border border-cyan-400/30 font-bold text-xs px-4 py-2.5 rounded-xl transition">{t.staffAuditSaveDraft}</button>
+            <button onClick={() => alert(language === 'hi' ? 'सत्यापन हेतु सबमिट किया गया!' : language === 'mr' ? 'सत्यापनासाठी सबमिट केले!' : 'Submitted for verification!')} className="bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow-md transition">{t.staffAuditSubmit}</button>
+          </div>
+        </div>
+
+        {/* Overall Score Dashboard */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="col-span-2 lg:col-span-1 bg-[#0f2b5c] border border-cyan-500/30 p-4 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
+            <div className="text-xs text-blue-200 font-semibold mb-1">{language === 'hi' ? 'समग्र स्कोर' : language === 'mr' ? 'एकूण स्कोअर' : 'Overall Score'}</div>
+            <div className={`text-4xl font-black ${overallPercent >= 70 ? 'text-emerald-300' : overallPercent >= 40 ? 'text-amber-300' : 'text-rose-300'}`}>{overallPercent}%</div>
+            <div className="text-[10px] text-blue-400 mt-1">{localizeNumber(totalScore, language)}/{localizeNumber(totalPossible, language)} items</div>
+          </div>
+          {auditSections.map((section) => {
+            const sc = sectionScore(section);
+            const pct = Math.round((sc / section.items.length) * 100);
+            return (
+              <div key={section.key} className="bg-[#0f2b5c] border border-cyan-500/30 p-4 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
+                <div className="text-lg mb-1">{section.icon}</div>
+                <div className="text-[10px] text-blue-200 font-semibold mb-1">{language === 'hi' ? section.titleHi : language === 'mr' ? section.titleMr : section.title}</div>
+                <div className={`text-2xl font-black ${pct >= 70 ? 'text-emerald-300' : pct >= 40 ? 'text-amber-300' : 'text-rose-300'}`}>{pct}%</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Audit Sections */}
+        <div className="space-y-6">
+          {auditSections.map((section) => (
+            <div key={section.key} className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-6 space-y-4 shadow-xl">
+              <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                <span className="text-lg">{section.icon}</span>
+                {language === 'hi' ? section.titleHi : language === 'mr' ? section.titleMr : section.title}
+              </h3>
+              <div className="space-y-3">
+                {section.items.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-[#081a3b] border border-blue-400/20 p-4 rounded-2xl">
+                    <span className="text-[11px] text-blue-100">{item}</span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name={`${section.key}-${idx}`} defaultChecked={section.scores[idx] === 1} className="accent-emerald-400" />
+                        <span className="text-[10px] text-emerald-300 font-semibold">{language === 'hi' ? 'हाँ' : language === 'mr' ? 'होय' : 'Yes'}</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name={`${section.key}-${idx}`} defaultChecked={section.scores[idx] === 0} className="accent-rose-400" />
+                        <span className="text-[10px] text-rose-300 font-semibold">{language === 'hi' ? 'नहीं' : language === 'mr' ? 'नाही' : 'No'}</span>
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Evidence Upload Section */}
+        <div className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-6 space-y-4 shadow-xl">
+          <h3 className="font-bold text-white text-sm">
+            {language === 'hi' ? '📎 साक्ष्य दस्तावेज अपलोड करें' : language === 'mr' ? '📎 पुरावा दस्तऐवज अपलोड करा' : '📎 Upload Evidence Documents'}
+          </h3>
+          <p className="text-xs text-blue-200 leading-relaxed">
+            {language === 'hi' ? 'अपने दावों के समर्थन में फ़ोटो, सरकारी प्रमाण पत्र, निरीक्षण रिपोर्ट या अन्य दस्तावेज अपलोड करें।' : language === 'mr' ? 'आपल्या दाव्यांच्या समर्थनार्थ फोटो, सरकारी प्रमाणपत्रे, तपासणी अहवाल किंवा इतर दस्तऐवज अपलोड करा.' : 'Upload photos, government certificates, inspection reports, or other documents to support your self-reported claims.'}
+          </p>
+          <div className="border-2 border-dashed border-blue-400/30 rounded-2xl p-8 text-center hover:border-cyan-400/50 transition cursor-pointer" onClick={() => alert(language === 'hi' ? 'फ़ाइल अपलोड डायलॉग (डेमो मोड)' : language === 'mr' ? 'फाइल अपलोड डायलॉग (डेमो मोड)' : 'File upload dialog (Demo Mode)')}>
+            <div className="text-3xl mb-2">📄</div>
+            <div className="text-xs text-blue-200 font-semibold">{language === 'hi' ? 'यहां क्लिक करें या फ़ाइल खींचें' : language === 'mr' ? 'येथे क्लिक करा किंवा फाइल ड्रॅग करा' : 'Click here or drag & drop files'}</div>
+            <div className="text-[10px] text-blue-400 mt-1">PDF, JPG, PNG (Max 10MB each)</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isStudent) {
+    return (
+      <div className="max-w-3xl mx-auto py-12 px-4 space-y-6">
+        <div className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-8 text-center space-y-6 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="bg-[#081a3b] text-amber-300 border border-amber-400/30 text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
+              Institutional Administration Module
+            </span>
+            <h1 className="text-2xl font-black text-white">
+              Institutional Audit Access Restricted
+            </h1>
+            <p className="text-sm text-blue-100 max-w-lg mx-auto leading-relaxed">
+              Institutional infrastructure auditing and assessment scoring is reserved for College / Institution Staff and Government Regulatory Officers.
+            </p>
+          </div>
+
+          <div className="p-4 bg-[#081a3b] rounded-2xl border border-blue-400/20 text-xs text-left text-blue-200 space-y-2">
+            <div className="font-bold text-cyan-300 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              Looking for public accessibility info?
+            </div>
+            <p className="text-[11px] leading-relaxed">
+              You can evaluate public, aggregated accessibility ratings across Jharkhand institutions in the <strong className="text-white">Public Authority Analytics</strong> portal.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <Link
+              href="/dashboard"
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5"
+            >
+              <span>Return to Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/authorities"
+              className="bg-[#081a3b] hover:bg-[#123366] text-cyan-300 border border-cyan-400/30 font-semibold px-5 py-2.5 rounded-xl text-xs transition"
+            >
+              View Public Authority Analytics
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 py-2 max-w-full overflow-hidden">

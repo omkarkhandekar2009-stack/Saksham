@@ -57,10 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
               </main>
             </div>
-            <AIChatDrawer />
           </>
         )}
+        {/* Global Saksham AI Assistant on all pages */}
+        <AIChatDrawer />
       </body>
     </html>
+
   );
 }
