@@ -18,6 +18,8 @@ import {
   FileCheck2,
   UserCheck,
   Building2,
+  Award,
+  Sparkles,
 } from 'lucide-react';
 import { AccessibilityEngine } from '@/lib/accessibility';
 
@@ -25,10 +27,11 @@ export default function LoginPage() {
   const router = useRouter();
   const { setRole, language } = useAppStore();
 
-  const [loginMethod, setLoginMethod] = useState<'udid' | 'staff' | 'sso'>('udid');
+  const [loginMethod, setLoginMethod] = useState<'udid' | 'staff' | 'sso' | 'professional'>('udid');
   const [udidNumber, setUdidNumber] = useState('MH2710120060088192');
   const [dob, setDob] = useState('2006-05-14');
   const [staffEmail, setStaffEmail] = useState('principal@inclusive.edu.in');
+  const [profEmail, setProfEmail] = useState('priya.kumari@sakshampath.org');
   const [password, setPassword] = useState('••••••••••••');
   const [showPassword, setShowPassword] = useState(false);
   const [captchaInput, setCaptchaInput] = useState('');
@@ -58,13 +61,15 @@ export default function LoginPage() {
       if (loginMethod === 'udid') {
         setRole('student');
       } else if (loginMethod === 'staff') {
-        setRole('principal');
+        setRole('institution_staff');
+      } else if (loginMethod === 'professional') {
+        setRole('accessibility_professional');
       } else {
-        setRole('government_authority');
+        setRole('government');
       }
       setIsLoading(false);
       router.push('/dashboard');
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -77,7 +82,7 @@ export default function LoginPage() {
           </div>
           <div>
             <span className="font-black text-xl tracking-wider text-slate-900">
-              INCLUDE<span className="text-blue-600">360</span>
+              Sak<span className="text-blue-600">sham</span>
             </span>
             <p className="text-[10px] text-slate-500 font-medium">
               National Inclusive Education & Accessibility Gateway
@@ -102,51 +107,65 @@ export default function LoginPage() {
               Sign In to Your Account
             </h1>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Select your authentication method below to securely access your student accommodations, audits, or administrative portal.
+              Select your authentication method below to securely access your student accommodations, professional assignments, audits, or administrative portal.
             </p>
           </div>
 
-          {/* Authentication Method Tabs */}
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-xs font-bold">
+          {/* Authentication Method 4-Tab Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-[11px] font-bold">
             <button
               type="button"
               onClick={() => setLoginMethod('udid')}
-              className={`py-2.5 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
+              className={`py-2.5 px-2 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
                 loginMethod === 'udid'
                   ? 'bg-blue-600 text-white shadow-sm font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" />
-              <span>UDID / Student</span>
+              <span className="text-center">UDID / Student</span>
             </button>
 
             <button
               type="button"
               onClick={() => setLoginMethod('staff')}
-              className={`py-2.5 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
+              className={`py-2.5 px-2 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
                 loginMethod === 'staff'
                   ? 'bg-blue-600 text-white shadow-sm font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>Staff & Educator</span>
+              <span className="text-center">Staff & Educator</span>
             </button>
 
             <button
               type="button"
               onClick={() => setLoginMethod('sso')}
-              className={`py-2.5 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
+              className={`py-2.5 px-2 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
                 loginMethod === 'sso'
                   ? 'bg-blue-600 text-white shadow-sm font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <Landmark className="w-3.5 h-3.5" />
-              <span>Government SSO</span>
+              <span className="text-center">Government SSO</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setLoginMethod('professional')}
+              className={`py-2.5 px-2 rounded-xl transition flex flex-col items-center justify-center gap-1 ${
+                loginMethod === 'professional'
+                  ? 'bg-blue-600 text-white shadow-sm font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5" />
+              <span className="text-center">Accessibility Pro</span>
             </button>
           </div>
+
 
           {/* FORM BODY */}
           <form onSubmit={handleLogin} className="space-y-4 text-xs">
@@ -258,6 +277,66 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* METHOD 4: ACCESSIBILITY PROFESSIONAL LOGIN */}
+            {loginMethod === 'professional' && (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700">
+                      Professional Email / Registration ID
+                    </label>
+                    <span className="text-[10px] text-blue-600 font-semibold">RCI / Certified Roster</span>
+                  </div>
+                  <input
+                    type="email"
+                    value={profEmail}
+                    onChange={(e) => setProfEmail(e.target.value)}
+                    placeholder="e.g. priya.kumari@sakshampath.org"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none font-mono"
+                    required
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Certified Scribe, Sign Language Interpreter, Lesson Reader, or Special Educator account.
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700">Password</label>
+                    <a href="#" className="text-[11px] text-blue-600 hover:underline">Forgot password?</a>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+                  <span className="text-[11px] text-slate-700 font-medium">New Support Professional?</span>
+                  <Link
+                    href="/auth/register-professional"
+                    className="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1"
+                  >
+                    <span>Register for Verification</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            )}
+
+
             {/* CAPTCHA / ACCESSIBLE SECURITY CODE (FOR METHODS 1 & 2) */}
             {loginMethod !== 'sso' && (
               <>
@@ -361,7 +440,7 @@ export default function LoginPage() {
 
       {/* Bottom Legal Footer */}
       <footer className="max-w-4xl mx-auto w-full pt-6 border-t border-slate-200 text-center text-xs text-slate-500 space-y-1">
-        <p>&copy; 2026 INCLUDE360. All rights reserved. Ministry of Education & RPWD Act 2016 Compliant.</p>
+        <p>&copy; 2026 Saksham. All rights reserved. Ministry of Education & RPWD Act 2016 Compliant.</p>
         <p className="text-[11px] text-slate-400">
           Designed for inclusive accessibility with Web Speech Voice API and screen reader compatibility.
         </p>

@@ -1,5 +1,9 @@
 export type Role =
   | 'student'
+  | 'institution_staff'
+  | 'government'
+  | 'accessibility_professional'
+  | 'professional'
   | 'parent'
   | 'teacher'
   | 'special_educator'
@@ -14,6 +18,7 @@ export type Role =
   | 'district_officer'
   | 'government_authority'
   | 'super_admin';
+
 
 export type DisabilityCategory =
   | 'visual'
@@ -247,5 +252,84 @@ export interface AccessibilitySettings {
   speechRate: number; // 0.8 to 1.5
   reducedMotion: boolean;
   voiceInputActive: boolean;
-  activeLanguage: 'en' | 'hi' | 'mr';
+  activeLanguage: 'hi' | 'en' | 'mr';
 }
+
+export type ProfessionalServiceType =
+  | 'certified_scribe'
+  | 'sign_language_interpreter'
+  | 'lesson_reader'
+  | 'exam_reader'
+  | 'assistant_teacher'
+  | 'special_educator'
+  | 'accessibility_support_assistant';
+
+export type ProfessionalStatus = 'pending_verification' | 'verified' | 'suspended' | 'inactive';
+
+export interface AccessibilityProfessional {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  district: string;
+  state: string;
+  primaryService: ProfessionalServiceType;
+  otherServices: ProfessionalServiceType[];
+  qualification: string;
+  experienceYears: number;
+  languages: string[];
+  organization?: string;
+  certificationDetails: string;
+  certificateDocumentUrl?: string;
+  status: ProfessionalStatus;
+  rating: number;
+  completedSessions: number;
+  supportHours: number;
+  availableDays: string[];
+  availableHours: string;
+  serviceArea: string;
+  preference: 'remote' | 'in_person' | 'both';
+  registeredAt: string;
+}
+
+export interface SupportRequest {
+  id: string;
+  studentId: string;
+  studentName: string;
+  institutionId: string;
+  institutionName: string;
+  supportType: ProfessionalServiceType;
+  subjectOrEvent: string;
+  date: string;
+  time: string;
+  durationHours: number;
+  location: string;
+  district: string;
+  languagePreference: string[];
+  additionalRequirements: string;
+  status: 'matching' | 'pending' | 'accepted' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+  assignedProfessionalId?: string;
+  assignedProfessionalName?: string;
+  createdAt: string;
+}
+
+export interface ProfessionalAssignment {
+  id: string;
+  requestId: string;
+  studentId: string;
+  studentName: string;
+  institutionName: string;
+  supportType: ProfessionalServiceType;
+  subjectOrEvent: string;
+  date: string;
+  time: string;
+  durationHours: number;
+  location: string;
+  status: 'pending' | 'accepted' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+  professionalId: string;
+  professionalName: string;
+  compensation?: string;
+}
+
+

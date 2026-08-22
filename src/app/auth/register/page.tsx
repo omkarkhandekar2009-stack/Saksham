@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import {
   Shield,
   UserCheck,
@@ -15,7 +16,43 @@ import {
   FileText,
   HeartHandshake,
   Sparkles,
+  Plus,
+  X,
 } from 'lucide-react';
+
+const recognizedDisabilities = [
+  { value: 'blindness', label: 'Blindness', aliases: ['blind', 'total blindness', 'visually blind'] },
+  { value: 'low_vision', label: 'Low Vision', aliases: ['low vision', 'partial blindness', 'visual impairment', 'visually impaired'] },
+  { value: 'leprosy_cured', label: 'Leprosy Cured Person', aliases: ['leprosy cured', 'leprosy cured person'] },
+  { value: 'hearing', label: 'Hearing Impairment', aliases: ['deaf', 'deafness', 'hard of hearing', 'hearing impaired', 'hearing impairment'] },
+  { value: 'locomotor', label: 'Locomotor Disability', aliases: ['locomotor', 'mobility disability', 'physical disability', 'orthopedic disability'] },
+  { value: 'dwarfism', label: 'Dwarfism', aliases: ['dwarfism', 'short stature disability'] },
+  { value: 'intellectual', label: 'Intellectual Disability', aliases: ['intellectual disability', 'intellectual impairment'] },
+  { value: 'mental_illness', label: 'Mental Illness', aliases: ['mental illness', 'psychiatric disability'] },
+  { value: 'autism', label: 'Autism Spectrum Disorder', aliases: ['autism', 'autistic', 'autism spectrum disorder', 'asd'] },
+  { value: 'cerebral_palsy', label: 'Cerebral Palsy', aliases: ['cerebral palsy', 'cp'] },
+  { value: 'muscular_dystrophy', label: 'Muscular Dystrophy', aliases: ['muscular dystrophy'] },
+  { value: 'chronic_neurological', label: 'Chronic Neurological Condition', aliases: ['chronic neurological condition', 'neurological disability'] },
+  { value: 'specific_learning', label: 'Specific Learning Disability', aliases: ['specific learning disability', 'learning disability', 'dyslexia', 'dyscalculia', 'dysgraphia'] },
+  { value: 'multiple_sclerosis', label: 'Multiple Sclerosis', aliases: ['multiple sclerosis', 'ms'] },
+  { value: 'speech_language', label: 'Speech and Language Disability', aliases: ['speech disability', 'language disability', 'speech and language disability', 'speech impairment'] },
+  { value: 'thalassemia', label: 'Thalassemia', aliases: ['thalassemia', 'thalassaemia'] },
+  { value: 'hemophilia', label: 'Hemophilia', aliases: ['hemophilia', 'haemophilia'] },
+  { value: 'sickle_cell', label: 'Sickle Cell Disease', aliases: ['sickle cell disease', 'sickle cell anemia', 'sickle cell anaemia'] },
+  { value: 'multiple', label: 'Multiple Disabilities including Deafblindness', aliases: ['multiple disabilities', 'multiple disability', 'deafblindness', 'deaf blind'] },
+  { value: 'acid_attack', label: 'Acid Attack Victim', aliases: ['acid attack victim', 'acid attack survivor'] },
+  { value: 'parkinsons', label: "Parkinson's Disease", aliases: ['parkinsons disease', "parkinson's disease", 'parkinson disease'] },
+];
+
+const normalizeDisability = (value: string) =>
+  value.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+
+const resolveDisability = (input: string) => {
+  const normalized = normalizeDisability(input);
+  return recognizedDisabilities.find((item) =>
+    [item.label, ...item.aliases].some((name) => normalizeDisability(name) === normalized)
+  );
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -26,7 +63,9 @@ export default function RegisterPage() {
   const [dob, setDob] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [disabilityCategory, setDisabilityCategory] = useState('visual');
+  const [disabilityCategories, setDisabilityCategories] = useState<string[]>([]);
+  const [disabilityInput, setDisabilityInput] = useState('');
+  const [disabilityError, setDisabilityError] = useState('');
   const [disabilityPercentage, setDisabilityPercentage] = useState(75);
   const [institutionName, setInstitutionName] = useState('Government Institute of Inclusive Science, Mumbai');
   const [grade, setGrade] = useState('Grade 11 - Science');
@@ -47,9 +86,38 @@ export default function RegisterPage() {
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const addDisability = () => {
+    const match = resolveDisability(disabilityInput);
+    if (!match) {
+      setDisabilityError('Sorry, that is not recognized as a valid disability. Please enter a valid disability name.');
+      return;
+    }
+
+    if (!disabilityCategories.includes(match.value)) {
+      setDisabilityCategories([...disabilityCategories, match.value]);
+    }
+    setDisabilityInput('');
+    setDisabilityError('');
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !udidNumber) return;
+
+    const typedDisability = disabilityInput.trim() ? resolveDisability(disabilityInput) : null;
+    if (disabilityInput.trim() && !typedDisability) {
+      setDisabilityError('Sorry, that is not recognized as a valid disability. Please enter a valid disability name.');
+      return;
+    }
+
+    const finalDisabilityCategories = typedDisability && !disabilityCategories.includes(typedDisability.value)
+      ? [...disabilityCategories, typedDisability.value]
+      : disabilityCategories;
+
+    if (finalDisabilityCategories.length === 0) {
+      setDisabilityError('Please enter a valid disability category before continuing.');
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -77,8 +145,8 @@ export default function RegisterPage() {
       accessibilityProfile: {
         id: `acc-${Date.now()}`,
         studentId: `std-${Date.now()}`,
-        categories: [disabilityCategory as any],
-        primaryCategory: disabilityCategory as any,
+        categories: finalDisabilityCategories as any,
+        primaryCategory: finalDisabilityCategories[0] as any,
         severity: (Number(disabilityPercentage) > 70 ? 'severe' : 'moderate') as 'moderate' | 'severe',
         communicationPreference: 'audio' as const,
         learningFormatPreference: 'audio_visual' as const,
@@ -92,6 +160,27 @@ export default function RegisterPage() {
     };
 
     addStudent(newStudent);
+
+    // Persist the registered student into the central Supabase `users` table (storage)
+    try {
+      if (supabase) {
+        const { error: dbError } = await supabase.from('users').upsert(
+          {
+            full_name: fullName,
+            phone_or_email: email || phone || udidNumber,
+            role: 'student',
+            preferred_lang: 'en',
+            disability_type: finalDisabilityCategories.join(','),
+            state: 'Maharashtra',
+            district: '',
+          },
+          { onConflict: 'phone_or_email' }
+        );
+        if (dbError) console.error('Supabase upsert failed:', dbError.message);
+      }
+    } catch (err) {
+      console.error('Supabase upsert error:', err);
+    }
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -113,7 +202,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <span className="font-black text-xl tracking-wider text-slate-900">
-              INCLUDE<span className="text-blue-600">360</span>
+              Sak<span className="text-blue-600">sham</span>
             </span>
             <p className="text-[10px] text-slate-500 font-medium">
               National Inclusive Education & Accessibility Gateway
@@ -200,7 +289,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">Date of Birth</label>
                       <input
@@ -210,24 +299,6 @@ export default function RegisterPage() {
                         className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none"
                         required
                       />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">Disability Category</label>
-                      <select
-                        value={disabilityCategory}
-                        onChange={(e) => setDisabilityCategory(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none capitalize"
-                      >
-                        <option value="visual">Visual Impairment / Blindness</option>
-                        <option value="hearing">Hearing Impairment / Deaf</option>
-                        <option value="locomotor">Locomotor / Mobility Disability</option>
-                        <option value="intellectual">Intellectual Disability</option>
-                        <option value="autism">Autism / Neurodiverse</option>
-                        <option value="specific_learning">Specific Learning Disability (Dyslexia)</option>
-                        <option value="speech_language">Speech & Language Disability</option>
-                        <option value="multiple">Multiple Disabilities</option>
-                      </select>
                     </div>
 
                     <div>
@@ -245,6 +316,73 @@ export default function RegisterPage() {
                         <span className="text-slate-500 font-bold">%</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="disability-category" className="block font-bold text-slate-700 mb-1.5">
+                      Disability Category <span className="font-normal text-slate-400">(type and press Enter)</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        id="disability-category"
+                        type="text"
+                        value={disabilityInput}
+                        onChange={(e) => {
+                          setDisabilityInput(e.target.value);
+                          setDisabilityError('');
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addDisability();
+                          }
+                        }}
+                        placeholder="e.g. Low vision, Dyslexia, Cerebral palsy"
+                        aria-describedby={disabilityError ? 'disability-error' : 'disability-help'}
+                        aria-invalid={Boolean(disabilityError)}
+                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none ${
+                          disabilityError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-blue-500'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={addDisability}
+                        className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Add
+                      </button>
+                    </div>
+
+                    {disabilityError ? (
+                      <p id="disability-error" role="alert" className="text-[11px] text-rose-600 mt-1.5 font-medium">
+                        {disabilityError}
+                      </p>
+                    ) : (
+                      <p id="disability-help" className="text-[10px] text-slate-500 mt-1.5">
+                        Enter one disability at a time. Common terms are matched to categories recognized under the RPwD Act, 2016.
+                      </p>
+                    )}
+
+                    {disabilityCategories.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2.5" aria-label="Added disability categories">
+                        {disabilityCategories.map((value) => {
+                          const item = recognizedDisabilities.find((category) => category.value === value);
+                          return (
+                            <span key={value} className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
+                              {item?.label || value.replace(/_/g, ' ')}
+                              <button
+                                type="button"
+                                onClick={() => setDisabilityCategories(disabilityCategories.filter((category) => category !== value))}
+                                className="rounded-full text-blue-500 hover:text-rose-600"
+                                aria-label={`Remove ${item?.label || value}`}
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -407,7 +545,7 @@ export default function RegisterPage() {
 
       {/* Footer */}
       <footer className="max-w-4xl mx-auto w-full pt-6 border-t border-slate-200 text-center text-xs text-slate-500 space-y-1">
-        <p>&copy; 2026 INCLUDE360. All rights reserved. Ministry of Social Justice & Empowerment Aligned.</p>
+        <p>&copy; 2026 Saksham. All rights reserved. Ministry of Social Justice & Empowerment Aligned.</p>
       </footer>
     </div>
   );

@@ -8,8 +8,9 @@ import { Volume2, VolumeX, Eye, Type, Globe, Sparkles, Move, Settings2, Keyboard
 
 export const AccessibilityBar: React.FC = () => {
   const { accessibilitySettings, updateAccessibilitySettings, language, setLanguage } = useAppStore();
-  const t = i18n[language];
+  const t = i18n[language] || i18n.hi;
   const [isOpen, setIsOpen] = useState(false);
+
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Instant DOM synchronization for font scaling and contrast presets
@@ -119,25 +120,31 @@ export const AccessibilityBar: React.FC = () => {
             {isSpeaking ? 'Stop TTS' : `${t.speechTTS} (Alt+R)`}
           </button>
 
-          {/* Language Switcher */}
+          {/* Language Switcher: Hindi first, English second, Marathi third */}
           <div className="flex items-center gap-1 bg-[#0f2b5c] border border-blue-400/30 rounded p-0.5" role="group" aria-label="Language selector">
             <Globe className="w-3 h-3 text-cyan-300 ml-1" />
-            {(['en', 'hi', 'mr'] as const).map((lang) => (
+            {[
+              { code: 'hi' as const, label: 'हिन्दी', title: 'Hindi' },
+              { code: 'en' as const, label: 'English', title: 'English' },
+              { code: 'mr' as const, label: 'मराठी', title: 'Marathi' },
+            ].map(({ code, label, title }) => (
               <button
-                key={lang}
+                key={code}
                 onClick={() => {
-                  setLanguage(lang);
-                  AccessibilityEngine.announceToScreenReader(`Language changed to ${lang === 'hi' ? 'Hindi' : lang === 'mr' ? 'Marathi' : 'English'}`);
+                  setLanguage(code);
+                  AccessibilityEngine.announceToScreenReader(`Language changed to ${title}`);
                 }}
-                className={`px-2 py-0.5 rounded text-xs font-medium uppercase transition ${
-                  language === lang ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold' : 'text-blue-300 hover:text-white'
+                className={`px-2 py-0.5 rounded text-xs font-medium transition ${
+                  language === code ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold' : 'text-blue-300 hover:text-white'
                 }`}
-                aria-label={`Switch language to ${lang}`}
+                aria-label={`Switch language to ${title}`}
+                title={title}
               >
-                {lang}
+                {label}
               </button>
             ))}
           </div>
+
 
           <button
             onClick={() => setIsOpen(!isOpen)}
