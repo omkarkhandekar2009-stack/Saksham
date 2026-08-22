@@ -20,7 +20,11 @@ const roleLabels: Record<Role, string> = {
   auditor: '12. Accessibility Auditor',
   district_officer: '13. District Officer',
   government_authority: '14. Govt Education Authority',
-  super_admin: '15. Super Admin',
+  government: '15. Government Authority',
+  institution_staff: '16. Institution Staff',
+  accessibility_professional: '17. Accessibility Support Professional',
+  professional: '18. Support Professional',
+  super_admin: '19. Super Admin',
 };
 
 export const DemoBar: React.FC = () => {

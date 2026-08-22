@@ -1,12 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useId } from 'react';
-import Link from 'next/link';
-import { useAppStore } from '@/lib/store';
-import { i18n, localizeNumber } from '@/lib/i18n';
 import {
   Search,
-
   Filter,
   X,
   Info,
@@ -22,13 +18,6 @@ import {
   FileText,
   CheckCircle2,
   ExternalLink,
-  Lock,
-  ArrowRight,
-  Upload,
-  Trash2,
-  Paperclip,
-  Check,
-  AlertCircle,
 } from 'lucide-react';
 import { jharkhandSchoolsData, SpecialSchool } from '@/data/jharkhandSchoolsData';
 import { jharkhandCollegesData, SpecialEducationInstitute, normalizeWebsiteUrl } from '@/data/jharkhandCollegesData';
@@ -42,7 +31,7 @@ const DEFAULT_ACCESSIBILITY_RATING = {
   laboratory: 12,
   emergency: 13,
   overall: 58,
-  ratingBasis: "Predefined prototype estimate — requires an on-site accessibility audit."
+  ratingBasis: "Predefined prototype rating — not based on a completed on-site audit and not an official Government of Jharkhand certification."
 };
 
 function InstitutionRatingsSection({
@@ -97,7 +86,7 @@ function InstitutionRatingsSection({
         <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
         <span>
           {rating.isFallback
-            ? "“Predefined prototype estimate — not based on a completed institutional audit and not an official Government of Jharkhand certification.”"
+            ? "“Predefined prototype rating — not based on a completed on-site audit and not an official Government of Jharkhand certification.”"
             : "“Prototype estimate — requires an on-site accessibility audit. This is not an official Government of Jharkhand certification.”"}
         </span>
       </div>
@@ -264,15 +253,8 @@ function InstitutionRatingsSection({
 }
 
 export default function AuditPage() {
-  const { currentRole, language } = useAppStore();
-  const t = i18n[language] || i18n.hi;
   const searchInputId = useId();
   const districtSelectId = useId();
-
-  const isStudent = currentRole === 'student' || currentRole === 'parent';
-  const isProfessional = currentRole === 'accessibility_professional' || currentRole === 'professional';
-  const isGovernment = currentRole === 'government' || currentRole === 'government_authority' || currentRole === 'district_officer' || currentRole === 'super_admin';
-  const isStaff = !isStudent && !isProfessional && !isGovernment;
 
   // Navigation Tab: 'schools' | 'colleges'
   const [selectedTab, setSelectedTab] = useState<'schools' | 'colleges'>('schools');
@@ -299,81 +281,21 @@ export default function AuditPage() {
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const modalCloseButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Staff Audit & Evidence Upload States (Unconditional Top-Level Hooks)
-  const [auditScores, setAuditScores] = useState<Record<string, number>>({
-    'physical-0': 1, 'physical-1': 1, 'physical-2': 0, 'physical-3': 1, 'physical-4': 0,
-    'learning-0': 1, 'learning-1': 0, 'learning-2': 0, 'learning-3': 1, 'learning-4': 1,
-    'tech-0': 1, 'tech-1': 0, 'tech-2': 0, 'tech-3': 0, 'tech-4': 1,
-    'human-0': 1, 'human-1': 0, 'human-2': 1, 'human-3': 1, 'human-4': 0,
-  });
-
-  const [auditStatus, setAuditStatus] = useState<'draft' | 'saved' | 'submitted_verification'>('draft');
-  const [auditSaveToast, setAuditSaveToast] = useState<string | null>(null);
-  const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
-  const [uploadedEvidence, setUploadedEvidence] = useState<Array<{ id: string; name: string; size: string; type: string; uploadedAt: string; category: string }>>([
-    { id: 'ev-01', name: 'Wheelchair_Ramp_Blueprints_AcademicBlock2.pdf', size: '2.4 MB', type: 'PDF Document', uploadedAt: '2026-08-15', category: 'Physical Accessibility' },
-    { id: 'ev-02', name: 'NVDA_ScreenReader_Lab_License_Proof.jpg', size: '1.1 MB', type: 'JPG Image', uploadedAt: '2026-08-18', category: 'Assistive Technology' },
-  ]);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleScoreChange = (key: string, value: number) => {
-    setAuditScores(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSaveDraft = () => {
-    setAuditStatus('saved');
-    setAuditSaveToast(
-      language === 'hi'
-        ? '✅ संस्थागत ऑडिट प्रारूप सफलतापूर्वक सुरक्षित किया गया!'
-        : language === 'mr'
-        ? '✅ संस्थात्मक ऑडिट मसुदा यशस्वीरित्या जतन केला!'
-        : '✅ Institutional accessibility audit draft saved successfully!'
-    );
-    setTimeout(() => setAuditSaveToast(null), 5000);
-  };
-
-  const handleConfirmSubmitVerification = () => {
-    setAuditStatus('submitted_verification');
-    setShowSubmitModal(false);
-    setAuditSaveToast(
-      language === 'hi'
-        ? '🎉 आधिकारिक सत्यापन हेतु राज्य प्राधिकरण को ऑडिट जमा किया गया! (ट्रैकिंग नं: JH-AUD-2026-9042)'
-        : language === 'mr'
-        ? '🎉 अधिकृत सत्यापनासाठी राज्य प्राधिकरणाकडे ऑडिट सादर केले! (ट्रॅकिंग क्र: JH-AUD-2026-9042)'
-        : '🎉 Institutional audit submitted to Government Authority for verification! Tracking ID: JH-AUD-2026-9042'
-    );
-    setTimeout(() => setAuditSaveToast(null), 6000);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const newEvs = Array.from(files).map((file, idx) => ({
-      id: `ev-${Date.now()}-${idx}`,
-      name: file.name,
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      type: file.name.toLowerCase().endsWith('.pdf') ? 'PDF Document' : 'Image / Document',
-      uploadedAt: new Date().toISOString().slice(0, 10),
-      category: 'Audit Evidence Proof',
-    }));
-    setUploadedEvidence(prev => [...prev, ...newEvs]);
-    setAuditSaveToast(
-      language === 'hi'
-        ? `📎 ${newEvs.length} साक्ष्य दस्तावेज सफलतापूर्वक संलग्न किए गए!`
-        : language === 'mr'
-        ? `📎 ${newEvs.length} पुरावा दस्तऐवज यशस्वीरित्या जोडले गेले!`
-        : `📎 Successfully attached ${newEvs.length} evidence document(s)!`
-    );
-    setTimeout(() => setAuditSaveToast(null), 4000);
-  };
-
-  const handleRemoveEvidence = (id: string) => {
-    setUploadedEvidence(prev => prev.filter(ev => ev.id !== id));
-  };
-
   // Dynamic District Lists
   const schoolDistricts = ['All Districts', ...Array.from(new Set(jharkhandSchoolsData.map((s) => s.district)))];
   const collegeDistricts = ['All Districts', ...Array.from(new Set(jharkhandCollegesData.map((c) => c.district)))];
+
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    if (viewingSchool || viewingCollege) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [viewingSchool, viewingCollege]);
 
   // Filtering Schools Data
   const filteredSchools = jharkhandSchoolsData.filter((school) => {
@@ -494,362 +416,6 @@ export default function AuditPage() {
     setCollegeSelectedDistrict('All Districts');
     setSrAnnouncement('Cleared college search and district filters.');
   };
-
-  if (isStaff) {
-    const auditSections = [
-      {
-        key: 'physical',
-        icon: '♿',
-        title: 'Physical Accessibility',
-        titleHi: 'भौतिक सुगमता',
-        titleMr: 'शारीरिक सुलभता',
-        items: ['Wheelchair-accessible entrance', 'Accessible toilets on all floors', 'Tactile pathways / Braille signage', 'Accessible parking', 'Lifts/ramps to all floors'],
-      },
-      {
-        key: 'learning',
-        icon: '📚',
-        title: 'Learning Accessibility',
-        titleHi: 'शिक्षण सुगमता',
-        titleMr: 'शिक्षण सुलभता',
-        items: ['Accessible digital textbooks', 'Audio-recorded lectures available', 'Sign language classroom support', 'Enlarged-print materials', 'Alternative assessment formats'],
-      },
-      {
-        key: 'tech',
-        icon: '💻',
-        title: 'Assistive Technology',
-        titleHi: 'सहायक तकनीक',
-        titleMr: 'सहाय्यक तंत्रज्ञान',
-        items: ['Screen reader-compatible computers (≥1)', 'Refreshable Braille display', 'FM loop system for hearing-impaired', 'Magnification software', 'Text-to-speech software installed'],
-      },
-      {
-        key: 'human',
-        icon: '🤝',
-        title: 'Human Support',
-        titleHi: 'मानव सहायता',
-        titleMr: 'मानव सहाय्य',
-        items: ['Trained special educator', 'Sign language interpreter on staff', 'Accessibility coordinator designated', 'Scribe/reader roster maintained', 'Annual inclusive training for all staff'],
-      },
-    ];
-
-    const sectionScore = (section: typeof auditSections[0]) => {
-      return section.items.reduce((acc, _, idx) => acc + (auditScores[`${section.key}-${idx}`] ?? 0), 0);
-    };
-
-    const totalScore = auditSections.reduce((acc, s) => acc + sectionScore(s), 0);
-    const totalPossible = auditSections.reduce((acc, s) => acc + s.items.length, 0);
-    const overallPercent = Math.round((totalScore / totalPossible) * 100);
-
-    return (
-      <div className="space-y-8 py-2">
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept=".pdf,.jpg,.jpeg,.png,.docx"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0f2b5c] border border-cyan-500/30 p-6 rounded-3xl shadow-xl">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="bg-[#081a3b] text-cyan-300 border border-cyan-400/40 text-xs font-bold px-3 py-0.5 rounded-full">
-                {language === 'hi' ? 'स्व-रिपोर्टिंग' : language === 'mr' ? 'स्व-अहवाल' : 'Self-Reporting'}
-              </span>
-              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
-                auditStatus === 'submitted_verification'
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
-                  : auditStatus === 'saved'
-                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/40'
-                  : 'bg-amber-500/20 text-amber-300 border-amber-400/40'
-              }`}>
-                {auditStatus === 'submitted_verification'
-                  ? 'Submitted for Verification (Under Govt Review)'
-                  : auditStatus === 'saved'
-                  ? 'Draft Saved'
-                  : t.staffAuditSelfReported}
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">{t.staffAuditTitle}</h1>
-            <p className="text-xs text-blue-100 mt-1">{t.staffAuditSubtitle}</p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={handleSaveDraft}
-              className="bg-[#081a3b] hover:bg-[#123366] text-cyan-300 border border-cyan-400/30 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
-            >
-              <Check className="w-4 h-4" />
-              <span>{t.staffAuditSaveDraft}</span>
-            </button>
-            <button
-              onClick={() => setShowSubmitModal(true)}
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-1.5"
-            >
-              <Upload className="w-4 h-4" />
-              <span>{t.staffAuditSubmit}</span>
-            </button>
-          </div>
-        </div>
-
-        {auditSaveToast && (
-          <div className="p-4 bg-emerald-950/90 border border-emerald-400/50 rounded-2xl text-xs text-emerald-200 flex items-center justify-between gap-2 shadow-xl animate-in fade-in-50">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span className="font-bold">{auditSaveToast}</span>
-            </div>
-            <button onClick={() => setAuditSaveToast(null)} className="text-blue-300 hover:text-white p-1">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Overall Score Dashboard */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="col-span-2 lg:col-span-1 bg-[#0f2b5c] border border-cyan-500/30 p-4 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
-            <div className="text-xs text-blue-200 font-semibold mb-1">{language === 'hi' ? 'समग्र स्कोर' : language === 'mr' ? 'एकूण स्कोअर' : 'Overall Score'}</div>
-            <div className={`text-4xl font-black ${overallPercent >= 70 ? 'text-emerald-300' : overallPercent >= 40 ? 'text-amber-300' : 'text-rose-300'}`}>{overallPercent}%</div>
-            <div className="text-[10px] text-blue-400 mt-1">{localizeNumber(totalScore, language)}/{localizeNumber(totalPossible, language)} items</div>
-          </div>
-          {auditSections.map((section) => {
-            const sc = sectionScore(section);
-            const pct = Math.round((sc / section.items.length) * 100);
-            return (
-              <div key={section.key} className="bg-[#0f2b5c] border border-cyan-500/30 p-4 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
-                <div className="text-lg mb-1">{section.icon}</div>
-                <div className="text-[10px] text-blue-200 font-semibold mb-1">{language === 'hi' ? section.titleHi : language === 'mr' ? section.titleMr : section.title}</div>
-                <div className={`text-2xl font-black ${pct >= 70 ? 'text-emerald-300' : pct >= 40 ? 'text-amber-300' : 'text-rose-300'}`}>{pct}%</div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Audit Sections */}
-        <div className="space-y-6">
-          {auditSections.map((section) => (
-            <div key={section.key} className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-6 space-y-4 shadow-xl">
-              <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                <span className="text-lg">{section.icon}</span>
-                {language === 'hi' ? section.titleHi : language === 'mr' ? section.titleMr : section.title}
-              </h3>
-              <div className="space-y-3">
-                {section.items.map((item, idx) => {
-                  const itemKey = `${section.key}-${idx}`;
-                  const isYes = auditScores[itemKey] === 1;
-                  return (
-                    <div key={idx} className="flex items-center justify-between bg-[#081a3b] border border-blue-400/20 p-4 rounded-2xl hover:border-cyan-400/30 transition">
-                      <span className="text-[11px] text-blue-100 font-medium">{item}</span>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer transition ${
-                          isYes ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50' : 'bg-[#0f2b5c] text-slate-400 border-blue-400/20'
-                        }`}>
-                          <input
-                            type="radio"
-                            name={itemKey}
-                            checked={isYes}
-                            onChange={() => handleScoreChange(itemKey, 1)}
-                            className="accent-emerald-400"
-                          />
-                          <span className="text-[11px] font-bold">{language === 'hi' ? 'हाँ' : language === 'mr' ? 'होय' : 'Yes'}</span>
-                        </label>
-
-                        <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer transition ${
-                          !isYes ? 'bg-rose-500/20 text-rose-300 border-rose-400/50' : 'bg-[#0f2b5c] text-slate-400 border-blue-400/20'
-                        }`}>
-                          <input
-                            type="radio"
-                            name={itemKey}
-                            checked={!isYes}
-                            onChange={() => handleScoreChange(itemKey, 0)}
-                            className="accent-rose-400"
-                          />
-                          <span className="text-[11px] font-bold">{language === 'hi' ? 'नहीं' : language === 'mr' ? 'नाही' : 'No'}</span>
-                        </label>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Evidence Upload Section */}
-        <div className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-6 space-y-5 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                <Paperclip className="w-4 h-4 text-cyan-400" />
-                {language === 'hi' ? 'साक्ष्य दस्तावेज एवं फोटो अपलोड करें' : language === 'mr' ? 'पुरावा दस्तऐवज आणि फोटो अपलोड करा' : 'Upload Evidence Documents & Proof'}
-              </h3>
-              <p className="text-xs text-blue-200 mt-1">
-                Upload photos, architectural blueprints, or certificates supporting self-reported claims.
-              </p>
-            </div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-md"
-            >
-              <Upload className="w-4 h-4" />
-              <span>Upload Evidence</span>
-            </button>
-          </div>
-
-          {/* Drag and Drop Zone */}
-          <div
-            className="border-2 border-dashed border-cyan-400/40 hover:border-cyan-300 rounded-2xl p-6 text-center transition cursor-pointer bg-[#081a3b]/60"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="text-3xl mb-2 text-cyan-300">📄</div>
-            <div className="text-xs text-blue-100 font-bold">{language === 'hi' ? 'यहां क्लिक करें या फ़ाइल चुनें (PDF, JPG, PNG)' : language === 'mr' ? 'येथे क्लिक करा किंवा फाइल निवडा (PDF, JPG, PNG)' : 'Click here to choose files (PDF, JPG, PNG)'}</div>
-            <div className="text-[10px] text-blue-400 mt-1">Maximum file size: 10MB each</div>
-          </div>
-
-          {/* Uploaded Evidence Cards */}
-          {uploadedEvidence.length > 0 && (
-            <div className="space-y-3 pt-2 border-t border-blue-400/20">
-              <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-                Attached Evidence Documents ({uploadedEvidence.length})
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {uploadedEvidence.map((ev) => (
-                  <div key={ev.id} className="p-3.5 bg-[#081a3b] border border-blue-400/20 rounded-2xl flex items-center justify-between gap-3 shadow-md">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="p-2 bg-cyan-500/20 text-cyan-300 rounded-xl shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div className="truncate text-xs">
-                        <div className="font-bold text-white truncate">{ev.name}</div>
-                        <div className="text-[10px] text-blue-300 flex items-center gap-2 mt-0.5">
-                          <span>{ev.size}</span>
-                          <span>•</span>
-                          <span>{ev.uploadedAt}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveEvidence(ev.id)}
-                      className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg transition shrink-0"
-                      title="Remove document"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* SUBMIT FOR VERIFICATION MODAL */}
-        {showSubmitModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in-50" onClick={() => setShowSubmitModal(false)}>
-            <div className="bg-[#0f2b5c] border-2 border-cyan-400/60 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5" onClick={e => e.stopPropagation()}>
-              <div className="flex items-start justify-between border-b border-blue-400/20 pb-3">
-                <div>
-                  <span className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">Government Verification</span>
-                  <h3 className="text-lg font-black text-white mt-0.5">Submit Institutional Audit</h3>
-                </div>
-                <button onClick={() => setShowSubmitModal(false)} className="text-blue-300 hover:text-white p-1">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-3 text-xs text-blue-100">
-                <p>
-                  You are about to submit your institution’s self-reported accessibility audit for official government verification under the <strong className="text-white">RPwD Act 2016</strong>.
-                </p>
-
-                <div className="p-4 bg-[#081a3b] rounded-2xl border border-blue-400/20 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Self-Reported Score:</span>
-                    <span className="font-bold text-emerald-300">{overallPercent}% ({totalScore}/{totalPossible} Items)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Evidence Attached:</span>
-                    <span className="font-bold text-white">{uploadedEvidence.length} Files</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Target Authority:</span>
-                    <span className="font-bold text-cyan-300">Jharkhand State Disability Comm.</span>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl text-[11px] text-amber-200 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span>Submitting locks the audit for review by district disability inspection officers.</span>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-blue-400/20">
-                <button onClick={() => setShowSubmitModal(false)} className="px-4 py-2.5 bg-[#081a3b] text-blue-200 font-bold rounded-xl text-xs">
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmSubmitVerification}
-                  className="px-5 py-2.5 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-1.5"
-                >
-                  <Check className="w-4 h-4" />
-                  Confirm &amp; Submit Audit
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (isStudent) {
-    return (
-      <div className="max-w-3xl mx-auto py-12 px-4 space-y-6">
-        <div className="bg-[#0f2b5c] border border-cyan-500/30 rounded-3xl p-8 text-center space-y-6 shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto">
-            <Lock className="w-8 h-8" />
-          </div>
-
-          <div className="space-y-2">
-            <span className="bg-[#081a3b] text-amber-300 border border-amber-400/30 text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
-              Institutional Administration Module
-            </span>
-            <h1 className="text-2xl font-black text-white">
-              Institutional Audit Access Restricted
-            </h1>
-            <p className="text-sm text-blue-100 max-w-lg mx-auto leading-relaxed">
-              Institutional infrastructure auditing and assessment scoring is reserved for College / Institution Staff and Government Regulatory Officers.
-            </p>
-          </div>
-
-          <div className="p-4 bg-[#081a3b] rounded-2xl border border-blue-400/20 text-xs text-left text-blue-200 space-y-2">
-            <div className="font-bold text-cyan-300 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              Looking for public accessibility info?
-            </div>
-            <p className="text-[11px] leading-relaxed">
-              You can evaluate public, aggregated accessibility ratings across Jharkhand institutions in the <strong className="text-white">Public Authority Analytics</strong> portal.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-3 pt-2">
-            <Link
-              href="/dashboard"
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5"
-            >
-              <span>Return to Dashboard</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/authorities"
-              className="bg-[#081a3b] hover:bg-[#123366] text-cyan-300 border border-cyan-400/30 font-semibold px-5 py-2.5 rounded-xl text-xs transition"
-            >
-              View Public Authority Analytics
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8 py-2 max-w-full overflow-hidden">

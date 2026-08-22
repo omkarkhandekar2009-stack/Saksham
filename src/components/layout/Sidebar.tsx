@@ -61,6 +61,7 @@ export const Sidebar: React.FC = () => {
       { label: t.navLearning || 'Learn with AI', href: '/learning', icon: BookOpen },
       { label: t.navServices || 'Get Support', href: '/accessibility', icon: HeartHandshake },
       { label: t.navExams || 'Exam Support', href: '/examinations', icon: FileCheck2 },
+      { label: t.navAudit || 'Institutional Audit', href: '/audit', icon: Building2 },
       { label: t.navGovernance || 'Schemes & NGOs', href: '/governance', icon: ShieldCheck },
       { label: t.navConduct || 'Report an Issue', href: '/conduct', icon: AlertOctagon },
     ];
