@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Shield,
@@ -25,12 +25,195 @@ import {
   BarChart3,
   HelpCircle,
   LogIn,
+  Play,
+  Pause,
+  RotateCcw,
+  VolumeX,
 } from 'lucide-react';
 
 export default function HomePage() {
+  const [showVideoIntro, setShowVideoIntro] = useState(true);
+  const [isIntroDismissed, setIsIntroDismissed] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Auto-play video on mount and transition to home after 8 seconds
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (showVideoIntro) {
+      if (videoRef.current) {
+        videoRef.current.play().catch(() => {
+          setIsMuted(true);
+        });
+      }
+
+      // Exactly 8.5 seconds video playtime then smoothly transition into home page
+      timer = setTimeout(() => {
+        handleTransitionToHome();
+      }, 8500);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [showVideoIntro]);
+
+  const handleTransitionToHome = () => {
+    // 1. Immediately freeze/pause the video so it never repeats or loops
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+    // 2. Fade out the video overlay
+    setShowVideoIntro(false);
+    // 3. Remove the overlay from DOM after fade-out transition completes
+    setTimeout(() => {
+      setIsIntroDismissed(true);
+    }, 1500);
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      const current = videoRef.current.currentTime;
+
+      // Trigger transition immediately at 8.5 seconds mark
+      if (current >= 8.5 && showVideoIntro) {
+        handleTransitionToHome();
+      }
+    }
+  };
+
+  const handleVideoEnd = () => {
+    handleTransitionToHome();
+  };
+
+  const handleSkipIntro = () => {
+    handleTransitionToHome();
+  };
+
+  const handleReplayIntro = () => {
+    setIsIntroDismissed(false);
+    setShowVideoIntro(true);
+    setIsVideoPlaying(true);
+    setVideoProgress(0);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        setIsVideoPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
   return (
-    <div className="bg-slate-50 text-slate-900 min-h-screen">
-      {/* 1. STANDALONE PUBLIC HEADER */}
+    <div className="bg-slate-50 text-slate-900 min-h-screen relative overflow-x-hidden">
+      {/* ============================================================ */}
+      {/* 🎬 1. FULLSCREEN 100% CINEMATIC VIDEO INTRO (EDGE-TO-EDGE) */}
+      {/* ============================================================ */}
+      {!isIntroDismissed && (
+        <div
+          className={`fixed inset-0 z-50 bg-black w-screen h-screen overflow-hidden transition-all duration-1500 ease-in-out ${
+            showVideoIntro ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-105 pointer-events-none'
+          }`}
+        >
+          {/* Edge-to-Edge Fullscreen Video */}
+          <video
+            ref={videoRef}
+            src="/hero-video.mp4"
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted={isMuted}
+            playsInline
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnd}
+          />
+
+          {/* Cinematic Vignette Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/60 pointer-events-none" />
+
+          {/* Top Brand Bar */}
+          <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
+            <div className="flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 shadow-2xl">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-black text-lg tracking-wider text-white">
+                  INCLUDE<span className="text-cyan-400">360</span>
+                </span>
+                <p className="text-[10px] text-blue-200">
+                  Smart India Hackathon • SIH1500
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleSkipIntro}
+              className="bg-white/95 hover:bg-white text-slate-950 font-black text-xs px-5 py-3 rounded-2xl shadow-2xl transition flex items-center gap-2 transform hover:scale-105 backdrop-blur-md"
+            >
+              <span>Skip Intro & Enter</span>
+              <ArrowRight className="w-4 h-4 text-blue-600" />
+            </button>
+          </div>
+
+          {/* Bottom Title & Control Bar */}
+          <div className="absolute bottom-8 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 z-30">
+            <div className="space-y-2 max-w-2xl bg-black/50 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
+              <div className="inline-flex items-center gap-2 bg-blue-600/60 border border-cyan-400/40 text-cyan-200 px-3.5 py-1 rounded-full text-xs font-bold w-fit">
+                <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+                <span>Education Without Barriers</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
+                Empowering Specially Abled Students
+              </h2>
+              <p className="text-xs sm:text-sm text-blue-200 leading-relaxed">
+                National operating system for student accessibility, legal compliance, examination scribes & inclusive governance.
+              </p>
+            </div>
+
+            {/* Audio & Playback Controls */}
+            <div className="flex items-center gap-2 self-end bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10">
+              <button
+                onClick={toggleMute}
+                className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition"
+                title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+              >
+                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+              </button>
+
+              <button
+                onClick={togglePlayPause}
+                className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition"
+                title={isVideoPlaying ? 'Pause Video' : 'Play Video'}
+              >
+                {isVideoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current text-cyan-400" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 🏛️ 2. STANDALONE PUBLIC HEADER */}
+      {/* ============================================================ */}
       <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -65,6 +248,15 @@ export default function HomePage() {
 
           {/* Action CTAs */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleReplayIntro}
+              className="hidden sm:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 transition"
+              title="Watch the Fullscreen Intro Video Again"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-blue-600" />
+              <span>Replay Video</span>
+            </button>
+
             <Link
               href="/kiosk"
               className="hidden sm:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 transition"
@@ -84,9 +276,17 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* MAIN EXPANSIVE CONTENT CONTAINER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20">
-        {/* 2. HERO SECTION */}
+      {/* ============================================================ */}
+      {/* 🌟 3. MAIN EXPANSIVE CONTENT (ULTRA SLOW REVEAL OVER 3.5 SECONDS) */}
+      {/* ============================================================ */}
+      <div
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20 transition-all duration-[3500ms] ease-out transform ${
+          showVideoIntro
+            ? 'opacity-0 blur-md scale-[0.96] translate-y-12'
+            : 'opacity-100 blur-0 scale-100 translate-y-0'
+        }`}
+      >
+        {/* HERO SECTION */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 via-white to-emerald-50 border border-slate-200 p-8 sm:p-16 shadow-xl text-center md:text-left">
           <div className="absolute -right-24 -top-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-24 -bottom-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -126,18 +326,18 @@ export default function HomePage() {
                 <span>Live System Dashboard</span>
               </Link>
 
-              <Link
-                href="/kiosk"
+              <button
+                onClick={handleReplayIntro}
                 className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-5 py-4 rounded-2xl border border-slate-300 flex items-center gap-2 text-sm transition shadow-xs"
               >
-                <Monitor className="w-4 h-4 text-blue-600" />
-                <span>Digital Campus Kiosk</span>
-              </Link>
+                <Play className="w-4 h-4 text-blue-600 fill-current" />
+                <span>Replay Fullscreen Intro</span>
+              </button>
             </div>
           </div>
         </section>
 
-        {/* 3. REAL-TIME PLATFORM STATISTICS */}
+        {/* REAL-TIME PLATFORM STATISTICS */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Specially Abled Students Active', value: '500+', sub: 'UDID Verified Across 5 Districts', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -160,7 +360,7 @@ export default function HomePage() {
           ))}
         </section>
 
-        {/* 4. PROBLEM STATEMENT & UNESCO 2019 CRISIS DATA */}
+        {/* PROBLEM STATEMENT & UNESCO 2019 CRISIS DATA */}
         <section id="problem" className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <span className="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-0.5 rounded-full">
@@ -201,7 +401,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 5. THE 4-STAGE STUDENT LIFECYCLE (HOW INCLUDE360 WORKS) */}
+        {/* THE 4-STAGE STUDENT LIFECYCLE (HOW INCLUDE360 WORKS) */}
         <section id="lifecycle" className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <span className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full">
@@ -258,7 +458,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 6. CORE PILLARS GRID */}
+        {/* CORE PILLARS GRID */}
         <section id="pillars" className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-0.5 rounded-full">
@@ -315,7 +515,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 7. 15-ROLE ECOSYSTEM DIRECTORY */}
+        {/* 15-ROLE ECOSYSTEM DIRECTORY */}
         <section id="roles" className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
             <div>
@@ -361,7 +561,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 8. CALL TO ACTION BANNER */}
+        {/* CALL TO ACTION BANNER */}
         <section className="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 text-white rounded-3xl p-8 sm:p-14 text-center space-y-6 shadow-xl">
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
             Ready to Enter the Inclusive Education Operating System?
@@ -385,7 +585,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 9. GOVERNMENT & INSTITUTIONAL FOOTER */}
+        {/* GOVERNMENT & INSTITUTIONAL FOOTER */}
         <footer className="bg-white border border-slate-200 rounded-3xl p-8 text-xs text-slate-500 space-y-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-slate-100">
             <div className="space-y-2">
